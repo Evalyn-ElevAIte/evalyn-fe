@@ -37,7 +37,7 @@ const Sidebar = ({ isExpanded }) => {
           <NavLink
             to="/home"
             className={({ isActive }) =>
-              `w-full flex items-center gap-4 pl-14 py-4 text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
+              `w-full flex items-center gap-6 pl-14 py-4 text-lg text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
                 isActive
                   ? "bg-white text-blue font-bold border border-[#F2AA32]"
                   : "hover:bg-white hover:shadow-sm text-gray-600"
@@ -52,7 +52,7 @@ const Sidebar = ({ isExpanded }) => {
           <NavLink
             to="/activity"
             className={({ isActive }) =>
-              `w-full flex items-center gap-4 pl-14 py-4 text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
+              `w-full flex items-center gap-6 pl-14 py-4 text-left text-lg rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
                 isActive
                   ? "bg-white text-blue font-bold border border-[#F2AA32]"
                   : "hover:bg-white hover:shadow-sm text-gray-600"
@@ -70,7 +70,7 @@ const Sidebar = ({ isExpanded }) => {
 
           {/* Quizzes Dropdown */}
           <div
-            className={`w-full pl-14 py-4 cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
+            className={`w-full pl-14 py-4 text-lg cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
               isQuizOpen ? "border border-orange" : ""
             }`}
             onClick={() => setIsQuizOpen(!isQuizOpen)}

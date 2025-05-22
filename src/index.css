@@ -3,4 +3,12 @@
 @theme {
   --color-orange: rgb(242, 170, 50);
   --color-blue: rgb(26, 137, 207);
+
+  --text-2sm: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 28px;
+  --text-3xl: 32px;
 }
