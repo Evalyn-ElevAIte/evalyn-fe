@@ -10,9 +10,9 @@ const MainLayout = () => {
     <div className="flex flex-col min-h-screen">
       <Topbar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       <div className="flex flex-1">
-        <Sidebar isExpanded={isExpanded} />
+        <Sidebar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
         <main
-          className={`flex-1 p-6 bg-[#f9fbfd] transition-all duration-300 ${
+          className={`mt-20 flex-1 p-6 bg-[#f9fbfd] transition-all duration-300 ${
             isExpanded ? "ml-84" : "ml-32"
           }`}
         >

@@ -8,7 +8,7 @@ const Home = () => {
       <h1 className="text-2xl font-semibold mb-1">
         Hi, Sarah <span className="inline-block">👋</span>
       </h1>
-      <p className="text-gray-500 mb-8">Ready to explore today?</p>
+      <p className="text-gray-500 mb-12">Ready to explore today?</p>
 
       <h2 className="text-lg font-medium mb-4">What would you like to do?</h2>
 

@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { RiArrowUpSFill, RiArrowDownSFill } from "react-icons/ri";
 
-const Sidebar = ({ isExpanded }) => {
+const Sidebar = ({ isExpanded, setIsExpanded }) => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   const sidebarWidth = isExpanded ? "w-86" : "w-32";
@@ -73,7 +73,12 @@ const Sidebar = ({ isExpanded }) => {
             className={`w-full pl-14 py-4 text-lg cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
               isQuizOpen ? "border border-orange" : ""
             }`}
-            onClick={() => setIsQuizOpen(!isQuizOpen)}
+            onClick={() => {
+              setIsQuizOpen(!isQuizOpen);
+              if (!isExpanded) {
+                setIsExpanded(true);
+              }
+            }}
           >
             {isExpanded &&
               (isQuizOpen ? (

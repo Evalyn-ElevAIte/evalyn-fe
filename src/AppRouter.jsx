@@ -12,7 +12,7 @@ const AppRouter = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: <Navigate to="/home" replace />,
       },
       {
         path: "settings",
