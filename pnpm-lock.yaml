@@ -23,6 +23,9 @@ importers:
       react-router-dom:
         specifier: ^7.6.0
         version: 7.6.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-typed:
+        specifier: ^2.0.12
+        version: 2.0.12(react@19.1.0)
       tailwindcss:
         specifier: ^4.1.7
         version: 4.1.7
@@ -1056,6 +1059,11 @@ packages:
       react-dom:
         optional: true
 
+  react-typed@2.0.12:
+    resolution: {integrity: sha512-sn59lrb4NKgvQLDGBRWM4wRNEz5Fp37F0BrLA2cKUmDqPSyQJOOiFigz+6wJof0o99QoE16nVCa3B3ID34ejsg==}
+    peerDependencies:
+      react: '>16.8.0'
+
   react@19.1.0:
     resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
     engines: {node: '>=0.10.0'}
@@ -1117,6 +1125,9 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
+
+  typed.js@2.1.0:
+    resolution: {integrity: sha512-bDuXEf7YcaKN4g08NMTUM6G90XU25CK3bh6U0THC/Mod/QPKlEt9g/EjvbYB8x2Qwr2p6J6I3NrsoYaVnY6wsQ==}
 
   update-browserslist-db@1.1.3:
     resolution: {integrity: sha512-UxhIZQ+QInVdunkDAaiazvvT/+fXL5Osr0JZlJulepYu6Jd7qJtDZjlur0emRlT71EN3ScPoE7gvsuIKKNavKw==}
@@ -2052,6 +2063,11 @@ snapshots:
     optionalDependencies:
       react-dom: 19.1.0(react@19.1.0)
 
+  react-typed@2.0.12(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      typed.js: 2.1.0
+
   react@19.1.0: {}
 
   resolve-from@4.0.0: {}
@@ -2123,6 +2139,8 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  typed.js@2.1.0: {}
 
   update-browserslist-db@1.1.3(browserslist@4.24.5):
     dependencies:
