@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import LandingPage from "./pages/LandingPage";
+import Activities from "./pages/Activities";
 
 const AppRouter = createBrowserRouter([
   // Landing page at root
@@ -40,7 +41,7 @@ const AppRouter = createBrowserRouter([
       },
       {
         path: "activity",
-        element: <div>Activity Page</div>,
+        element: <Activities />,
       },
       {
         path: "quizzes",
