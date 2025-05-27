@@ -1,27 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaHistory, FaHome } from "react-icons/fa";
 import { GoBook } from "react-icons/go";
 import { LuSettings } from "react-icons/lu";
-import { NavLink } from "react-router-dom";
-import { useState } from "react";
 import { RiArrowUpSFill, RiArrowDownSFill } from "react-icons/ri";
+import { BsFillPersonFill } from "react-icons/bs";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = ({ isExpanded, setIsExpanded }) => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isEnrolledOpen, setIsEnrolledOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const sidebarWidth = isExpanded ? "w-86" : "w-32";
 
   const dummyQuizzes = [
+    { title: "Programming Basics", dueDate: "Tuesday, 20 Mei 2025" },
+    { title: "Programming Logic", dueDate: "Tuesday, 20 Mei 2025" },
+    { title: "Programming Final", dueDate: "Tuesday, 20 Mei 2025" },
+  ];
+
+  const enrolledCourses = [
     {
-      title: "Programming Basics",
+      title: "Intro to React",
+      instructor: "John Doe",
       dueDate: "Tuesday, 20 Mei 2025",
     },
     {
-      title: "Programming Logic",
-      dueDate: "Tuesday, 20 Mei 2025",
-    },
-    {
-      title: "Programming Final",
+      title: "Database Systems",
+      instructor: "Jane Smith",
       dueDate: "Tuesday, 20 Mei 2025",
     },
   ];
@@ -63,20 +70,21 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
             {isExpanded && <span>Activity</span>}
           </NavLink>
 
-          {/* Divider */}
           {isExpanded && (
-            <div className={`border-t border-[#F2AA32] mr-8 my-6`} />
+            <div className="border-t border-[#F2AA32] mr-8 my-6" />
           )}
 
-          {/* Quizzes Dropdown */}
+          {/* My Quizzes */}
           <div
             className={`w-full pl-14 py-4 text-lg cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
               isQuizOpen ? "border border-orange" : ""
             }`}
             onClick={() => {
               setIsQuizOpen(!isQuizOpen);
-              if (!isExpanded) {
-                setIsExpanded(true);
+              if (!isExpanded) setIsExpanded(true);
+              setIsEnrolledOpen(false);
+              if (isQuizOpen) {
+                navigate("/quizzes");
               }
             }}
           >
@@ -96,13 +104,12 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
             </div>
           </div>
 
-          {/* Quiz Items */}
           {isExpanded && isQuizOpen && (
             <div className="ml-14 mt-4 space-y-3">
               {dummyQuizzes.map((quiz, index) => (
                 <div
                   key={index}
-                  className="flex  gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"
+                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"
                 >
                   <div className="bg-[#F2AA32] text-white font-bold rounded-full w-6 h-6 flex items-center justify-center text-xs">
                     P
@@ -113,6 +120,60 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
                     </div>
                     <div className="text-xs text-gray-500">
                       due to: {quiz.dueDate}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Enrolled Courses Dropdown */}
+          <div
+            className={`w-full pl-14 mt-4
+               py-4 text-lg cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
+                 isEnrolledOpen ? "border border-orange" : ""
+               }`}
+            onClick={() => {
+              setIsEnrolledOpen(!isEnrolledOpen);
+              if (!isExpanded) setIsExpanded(true);
+              if (isQuizOpen) setIsQuizOpen(false);
+              if (isEnrolledOpen) {
+                navigate("/quizzes");
+              }
+            }}
+          >
+            {isExpanded &&
+              (isEnrolledOpen ? (
+                <RiArrowUpSFill size={24} className="text-orange" />
+              ) : (
+                <RiArrowDownSFill size={24} className="text-orange" />
+              ))}
+            <div
+              className={`ml-2 flex items-center gap-4 ${
+                isEnrolledOpen ? "text-blue font-bold" : ""
+              }`}
+            >
+              <BsFillPersonFill size={18} />
+              {isExpanded && <span>Enrolled</span>}
+            </div>
+          </div>
+
+          {isExpanded && isEnrolledOpen && (
+            <div className="ml-14 mt-4 space-y-3">
+              {enrolledCourses.map((course, index) => (
+                <div
+                  key={index}
+                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"
+                >
+                  <div className="bg-[#F2AA32] text-white font-bold rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                    P
+                  </div>
+                  <div>
+                    <div className="font-semibold truncate w-28">
+                      {course.title}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      due to: {course.dueDate}
                     </div>
                   </div>
                 </div>
