@@ -9,14 +9,14 @@ import {
   FileText,
   Clock,
   Send,
-} from "lucide-react"; // Import Lucide icons for Recent Activity
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  // Dummy data for the "Your Recent Activity" section, taking 3 items from the provided dummyActivities
   const rawDummyActivities = [
     {
       day: "Today",
-      type: "My Quizzes", // Corresponds to 'You created a new quiz:'
+      type: "My Quizzes",
       status: "created",
       quizTitle: "Introduction to Philosophy",
       message: "Quiz created! Keep an eye on it regularly.",
@@ -24,7 +24,7 @@ const Home = () => {
     },
     {
       day: "Today",
-      type: "Enrolled", // Corresponds to 'New submission:'
+      type: "Enrolled",
       status: "unfinished",
       quizTitle: "Mathematics Basics",
       message: "New quiz is out—make sure to complete it on time!",
@@ -32,7 +32,7 @@ const Home = () => {
     },
     {
       day: "Yesterday",
-      type: "Enrolled", // Corresponds to 'You have submitted quiz:'
+      type: "Enrolled",
       status: "submitted",
       quizTitle: "Biology 101",
       message: "Your score is coming soon, hang tight!",
@@ -40,7 +40,7 @@ const Home = () => {
     },
     {
       day: "Yesterday",
-      type: "Enrolled", // Corresponds to 'Your submission has just been graded:'
+      type: "Enrolled",
       status: "graded",
       quizTitle: "Chemistry Fundamentals",
       message: "Sarah Johnson completed the quiz",
@@ -48,15 +48,14 @@ const Home = () => {
     },
     {
       day: "Yesterday",
-      type: "My Quizzes", // Corresponds to 'You created a new quiz:' (as per image)
-      status: "done", // This status is used for the "All the participant already finish the quiz" message
+      type: "My Quizzes",
+      status: "done",
       quizTitle: "Chemistry Fundamentals",
       message: "All the participant already finish the quiz",
       time: "1 day ago",
     },
   ];
 
-  // Map the first 3 items from rawDummyActivities to the structure needed for recentActivities
   const recentActivities = rawDummyActivities.slice(0, 3).map((item, index) => {
     let iconComponent;
     let statusText;
@@ -64,16 +63,15 @@ const Home = () => {
     let statusColor;
     let titlePrefix;
 
-    // Determine icon, status text, and colors based on the item's type and status
     if (item.type === "My Quizzes") {
       if (item.status === "created") {
-        iconComponent = <FileText size={48} className="text-blue-700" />; // Increased icon size
+        iconComponent = <FileText size={48} className="text-blue" />;
         statusText = "New";
         statusBg = "bg-blue-100";
         statusColor = "text-blue-700";
         titlePrefix = "Quiz Created:";
       } else if (item.status === "done") {
-        iconComponent = <CheckCircle size={48} className="text-green-700" />; // Increased icon size
+        iconComponent = <CheckCircle size={48} className="text-green-700" />;
         statusText = "Completed";
         statusBg = "bg-green-100";
         statusColor = "text-green-700";
@@ -81,19 +79,19 @@ const Home = () => {
       }
     } else if (item.type === "Enrolled") {
       if (item.status === "unfinished") {
-        iconComponent = <Clock size={48} className="text-orange-500" />; // Increased icon size
-        statusText = "Pending"; // Using Pending for unfinished as per common UI patterns
+        iconComponent = <Clock size={48} className="text-orange-500" />;
+        statusText = "Pending";
         statusBg = "bg-orange-100";
         statusColor = "text-orange-700";
         titlePrefix = "New Submission:";
       } else if (item.status === "submitted") {
-        iconComponent = <Send size={48} className="text-purple-700" />; // Increased icon size
+        iconComponent = <Send size={48} className="text-purple-700" />;
         statusText = "Submitted";
         statusBg = "bg-purple-100";
         statusColor = "text-purple-700";
         titlePrefix = "Quiz Submitted:";
       } else if (item.status === "graded") {
-        iconComponent = <CheckCircle size={48} className="text-green-700" />; // Increased icon size
+        iconComponent = <CheckCircle size={48} className="text-green-700" />;
         statusText = "Graded";
         statusBg = "bg-green-100";
         statusColor = "text-green-700";
@@ -102,9 +100,9 @@ const Home = () => {
     }
 
     return {
-      id: index, // Using index as ID for simplicity
+      id: index,
       icon: iconComponent,
-      title: `${titlePrefix} ${item.quizTitle}`, // Combine prefix and quizTitle for the main title
+      title: `${titlePrefix} ${item.quizTitle}`,
       description: item.message,
       status: statusText,
       statusBg: statusBg,
@@ -112,6 +110,11 @@ const Home = () => {
     };
   });
 
+  const navigate = useNavigate();
+
+  const createQuizHandle = () => {
+    navigate("/create");
+  };
   return (
     <div className="min-h-screen bg-white px-6 py-8 font-sans text-gray-800">
       <h1 className="text-2xl font-semibold mb-1">
@@ -124,21 +127,24 @@ const Home = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
         <div className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition">
           <div className="text-3xl mb-4">
-            <HiOutlineBookOpen size={86} className="text-blue-500" />
+            <HiOutlineBookOpen size={86} className="text-blue" />
           </div>
           <h3 className="text-xl font-semibold mb-2">Create a Quiz</h3>
           <p className="text-gray-600 mb-4">
             Design custom quizzes with various answer formats (text, multiple
             choice, or video). AI will help you review student answers.
           </p>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium cursor-pointer">
+          <button
+            onClick={createQuizHandle}
+            className="bg-blue hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium cursor-pointer"
+          >
             + Create Quiz
           </button>
         </div>
 
         <div className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition">
           <div className="text-3xl mb-4">
-            <PiGraduationCap size={86} className="text-blue-500" />
+            <PiGraduationCap size={86} className="text-blue" />
           </div>
           <h3 className="text-xl font-semibold mb-2">Join a Quiz</h3>
           <p className="text-gray-600 mb-4">
@@ -151,7 +157,7 @@ const Home = () => {
               placeholder="Enter quiz code..."
               className="border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded font-medium cursor-pointer flex gap-4 items-center">
+            <button className="bg-blue hover:bg-blue-600 text-white px-6 py-3 rounded font-medium cursor-pointer flex gap-4 items-center">
               <CiLogin size={24} className="text-white" />
               Join
             </button>

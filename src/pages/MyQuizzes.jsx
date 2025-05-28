@@ -66,17 +66,23 @@ const MyQuizzes = () => {
   const totalPagesEnrolled = Math.ceil(enrolledQuizzes.length / quizzesPerPage);
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-1">My Quizzes</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Manage your quizzes and view student submissions.
-      </p>
-
-      <input
-        type="text"
-        placeholder="Search quizzes..."
-        className="w-full max-w-md border border-gray-300 rounded-lg px-4 py-2 text-sm mb-6"
-      />
+    <div className="">
+      <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">My Quizzes</h2>
+        <p className="text-sm text-gray-600">
+          Manage your quizzes and view student submissions.
+        </p>
+      </div>
+      <div className="flex justify-between items-center">
+        <input
+          type="text"
+          placeholder="Search quizzes..."
+          className="w-full max-w-md border my-6 border-gray-300 rounded-lg px-4 py-2 text-sm mb-6"
+        />
+        <button className="bg-blue hover:bg-blue-600 text-white px-6 py-3 h-14 rounded-xl font-medium cursor-pointer">
+          + Create Quiz
+        </button>
+      </div>
 
       <h2 className="text-base font-semibold text-gray-700 mb-2">My Quizzes</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -105,7 +111,7 @@ const MyQuizzes = () => {
             <p className="text-sm text-gray-500 mb-3">
               {quiz.submissions} submissions
             </p>
-            <button className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+            <button className="bg-blue text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all cursor-pointer">
               View Submissions
             </button>
           </div>
@@ -174,7 +180,7 @@ const MyQuizzes = () => {
             <p className="text-sm text-gray-500 mb-3">
               {quiz.submissions} submissions
             </p>
-            <button className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+            <button className="bg-blue text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all cursor-pointer">
               View Submissions
             </button>
           </div>

@@ -67,7 +67,7 @@ const Activities = () => {
     if (item.type === "My Quizzes") {
       if (item.status === "created") {
         iconComponent = <FileText size={48} />;
-        iconBgColorClass = "bg-blue-500";
+        iconBgColorClass = "bg-blue";
         descriptionText = "You created a new quiz:";
       } else if (item.status === "done") {
         iconComponent = <CheckCircle size={48} />;
@@ -100,9 +100,7 @@ const Activities = () => {
 
   return (
     <div className="font-sans">
-      {" "}
-      <div className="bg-blue-50 px-4 py-8 rounded-t-lg">
-        {" "}
+      <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Recent Activity
         </h2>
@@ -183,7 +181,7 @@ const Activities = () => {
                     </div>
 
                     <div className="flex flex-col md:flex-row items-end md:items-center gap-2 mt-4 md:mt-0 md:ml-4 flex-shrink-0">
-                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium px-2 py-1 rounded transition-colors duration-200">
+                      <button className="text-blue hover:text-blue-200 cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors duration-200">
                         View Quiz
                       </button>
                       <span className="text-xs text-gray-400 md:ml-4 whitespace-nowrap">
