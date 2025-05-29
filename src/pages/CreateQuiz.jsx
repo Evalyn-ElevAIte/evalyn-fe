@@ -276,17 +276,17 @@ const CreateQuiz = () => {
             {q.type === "text" && (
               <>
                 <label className="block font-semibold text-sm text-gray-700 mb-1">
-                  Answer Options
+                  Example Answer (optional)
                 </label>
                 <textarea
                   placeholder="Expected answer(s), comma-separated"
                   className="w-full mb-3 px-3 py-2 border rounded"
-                  value={q.expectedAnswer.join(", ")}
+                  value={q.expectedAnswerRaw || ""}
                   onChange={(e) =>
                     handleQuestionChange(
                       index,
-                      "expectedAnswer",
-                      e.target.value.split(",").map((a) => a.trim())
+                      "expectedAnswerRaw",
+                      e.target.value
                     )
                   }
                 />
@@ -359,6 +359,15 @@ const CreateQuiz = () => {
             className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
           >
             Publish Quiz
+          </button>
+
+          <button
+            onClick={() => {
+              saveQuiz("published");
+            }}
+            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Check
           </button>
         </div>
       </div>

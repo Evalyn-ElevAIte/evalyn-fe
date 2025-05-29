@@ -136,8 +136,8 @@ const Home = () => {
           </div>
           <h3 className="text-xl font-semibold mb-2">Create a Quiz</h3>
           <p className="text-gray-600 mb-4">
-            Design custom quizzes with various answer formats (text, multiple
-            choice, or video). AI will help you review student answers.
+            Design custom quizzes with various answer formats (text, multiple or
+            single choice). AI will help you review student answers.
           </p>
           <button
             onClick={createQuizHandle}
