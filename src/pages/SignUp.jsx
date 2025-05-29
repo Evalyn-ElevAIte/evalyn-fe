@@ -1,14 +1,49 @@
 import React from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HeroBg from "../assets/images/hero_bg.png";
+import { useState } from "react";
+import { register } from "../services/auth";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const signUpHandle = async () => {
+    if (password != confirmPassword) {
+      alert("Please make sure your confirm password");
+    } else {
+      try {
+        const signUpResponse = await register(name, email, password);
+        if (signUpResponse.status === 201) {
+          toast.success("Sign up successful! Redirecting to login...");
+          setTimeout(() => {
+            navigate("/signin");
+          }, 2500);
+        }
+      } catch (error) {
+        console.log("error :", error);
+        if (error.response?.data?.detail === "Email already registered") {
+          toast.error("Email already registered, please use another email!");
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+      }
+    }
+  };
+
   return (
     <div
       className="min-h-[95vh] flex items-center justify-center bg-[#f3faff] bg-cover bg-center px-6"
       style={{ backgroundImage: `url(${HeroBg})` }}
     >
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="bg-white border border-yellow-300 rounded-[2rem] shadow-2xl w-full max-w-[90rem] flex flex-col md:flex-row overflow-hidden">
         {/* Left: Sign up form */}
         <div className="bg-[#eaf6ff] w-full md:w-1/2 p-20 flex flex-col justify-center">
@@ -26,6 +61,10 @@ const SignUp = () => {
                 type="text"
                 placeholder="Name"
                 className="outline-none flex-1 text-lg bg-transparent"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
               />
             </div>
 
@@ -35,6 +74,10 @@ const SignUp = () => {
                 type="email"
                 placeholder="Email"
                 className="outline-none flex-1 text-lg bg-transparent"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
               />
             </div>
 
@@ -44,6 +87,10 @@ const SignUp = () => {
                 type="password"
                 placeholder="Password"
                 className="outline-none flex-1 text-lg bg-transparent"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                }}
               />
             </div>
 
@@ -53,10 +100,18 @@ const SignUp = () => {
                 type="password"
                 placeholder="Confirm Password"
                 className="outline-none flex-1 text-lg bg-transparent"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                }}
               />
             </div>
 
-            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-lg shadow-lg mt-6 text-xl">
+            <button
+              type="button"
+              onClick={signUpHandle}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-lg shadow-lg mt-6 text-xl"
+            >
               Sign up
             </button>
           </form>
@@ -80,6 +135,17 @@ const SignUp = () => {
           >
             Sign in
           </Link>
+          {/* <button
+            onClick={() => {
+              console.log("name: ", name);
+              console.log("email: ", email);
+              console.log("password: ", password);
+              console.log("confirmPassword: ", confirmPassword);
+            }}
+            className="bg-blue p-6"
+          >
+            Check
+          </button> */}
         </div>
       </div>
     </div>

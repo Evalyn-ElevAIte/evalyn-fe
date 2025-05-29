@@ -11,6 +11,8 @@ import {
   Send,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getUser } from "../services/user";
+import { useEffect } from "react";
 
 const Home = () => {
   const rawDummyActivities = [
@@ -111,6 +113,9 @@ const Home = () => {
   });
 
   const navigate = useNavigate();
+  const userName = localStorage.getItem("evalyn_username");
+
+  useEffect(() => {}, []);
 
   const createQuizHandle = () => {
     navigate("/create");
@@ -118,7 +123,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white px-6 py-8 font-sans text-gray-800">
       <h1 className="text-2xl font-semibold mb-1">
-        Hi, Sarah <span className="inline-block">👋</span>
+        Hi, {userName} <span className="inline-block">👋</span>
       </h1>
       <p className="text-gray-500 mb-12">Ready to explore today?</p>
 

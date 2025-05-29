@@ -99,7 +99,7 @@ const Activities = () => {
   };
 
   return (
-    <div className="font-sans">
+    <div className="">
       <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Recent Activity
