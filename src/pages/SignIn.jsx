@@ -23,16 +23,16 @@ const SignIn = () => {
         localStorage.setItem("evalyn_token", access_token);
         console.log("access_token: ", access_token);
         toast.success("Sign up successful! Redirecting to login...");
-        const userResponse = await getUser();
-        if (userResponse.status == 200) {
-          console.log("userResponse: ", userResponse);
-          const username = userResponse.data.name;
-          console.log("username: ", username);
-          localStorage.setItem("evalyn_username", username);
-          setTimeout(() => {
-            navigate("/home");
-          }, 2500);
-        }
+        setTimeout(() => {
+          navigate("/home");
+        }, 2500);
+        // const userResponse = await getUser();
+        // if (userResponse.status == 200) {
+        //   console.log("userResponse: ", userResponse);
+        //   const username = userResponse.data.name;
+        //   console.log("username: ", username);
+        //   localStorage.setItem("evalyn_username", username);
+        // }
       }
     } catch (error) {
       console.log("error :", error);

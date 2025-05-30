@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../services/user";
 import { useEffect } from "react";
+import { useState } from "react";
 
 const Home = () => {
   const rawDummyActivities = [
@@ -113,9 +114,22 @@ const Home = () => {
   });
 
   const navigate = useNavigate();
-  const userName = localStorage.getItem("evalyn_username");
+  const [userName, setUserName] = useState("");
 
-  useEffect(() => {}, []);
+  const fetchUserData = async () => {
+    try {
+      const userResponse = await getUser();
+      console.log("userResponse: ", userResponse);
+      if (userResponse.status == 200) {
+        setUserName(userResponse.data.name);
+      }
+    } catch (error) {
+      console.log("error :", error);
+    }
+  };
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const createQuizHandle = () => {
     navigate("/create");

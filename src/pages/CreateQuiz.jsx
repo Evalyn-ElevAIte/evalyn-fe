@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
+import { creatQuizWithQuestions } from "../services/quiz";
 
 const initialQuestion = {
   question: "",
@@ -18,10 +19,19 @@ const CreateQuiz = () => {
   const [dueTime, setDueTime] = useState("");
   const [duration, setDuration] = useState("");
   const [questions, setQuestions] = useState([initialQuestion]);
+  const [overallNotes, setOverallNotes] = useState("");
 
   const handleQuestionChange = (index, field, value) => {
     const updated = [...questions];
-    updated[index][field] = value;
+
+    if (field === "type") {
+      updated[index].type = value;
+      updated[index].expectedAnswer = [];
+      updated[index].options = ["", "", "", ""];
+    } else {
+      updated[index][field] = value;
+    }
+
     setQuestions(updated);
   };
 
@@ -81,10 +91,13 @@ const CreateQuiz = () => {
         alert(`Please complete all options in question ${i + 1}.`);
         return false;
       }
-      if (q.expectedAnswer.length === 0) {
-        alert(
-          `Please mark at least one expected answer for question ${i + 1}.`
-        );
+      if (
+        (q.type === "text" &&
+          (!q.expectedAnswer || q.expectedAnswer.trim() === "")) ||
+        ((q.type === "single" || q.type === "multiple") &&
+          (!Array.isArray(q.expectedAnswer) || q.expectedAnswer.length === 0))
+      ) {
+        alert(`Please fill the expected answer for question ${i + 1}.`);
         return false;
       }
       if (!q.rubric.trim()) {
@@ -99,18 +112,46 @@ const CreateQuiz = () => {
 
     return true;
   };
-  const saveQuiz = (status) => {
-    const quizData = {
+  const saveQuiz = async () => {
+    const end_time = new Date(`${dueDate}T${dueTime}`).toISOString();
+
+    const start_time = new Date().toISOString();
+
+    const transformedQuestions = questions.map((q) => ({
+      text: q.question,
+      type:
+        q.type === "text"
+          ? "text"
+          : q.type === "single"
+          ? "single_choice"
+          : "multiple_choice",
+      options:
+        q.type === "text" ? [] : q.options.filter((opt) => opt.trim() !== ""),
+      expected_answer:
+        q.type === "text" ? [q.expectedAnswer || ""] : q.expectedAnswer,
+      rubric: q.rubric,
+      rubric_max_score: q.rubricMaxScore,
+    }));
+
+    const payload = {
       title: quizTitle,
-      description,
-      dueDate,
-      dueTime,
-      duration,
-      questions,
-      status,
+      description: description,
+      start_time: start_time,
+      end_time: end_time,
+      duration: parseInt(duration),
+      questions: transformedQuestions,
+      completed: false,
+      lecturer_overall_notes: overallNotes,
     };
-    console.log("Saving quiz:", quizData);
-    // Replace this with an API call
+    try {
+      const createResponse = await creatQuizWithQuestions(payload);
+      console.log("createResponse: ", createResponse);
+      // if (createResponse.status == 200) {
+      // }
+    } catch (error) {
+      console.log("error :", error);
+    }
+    // console.log("Saving quiz:", payload);
   };
 
   return (
@@ -167,6 +208,27 @@ const CreateQuiz = () => {
           className="w-full mb-3 px-4 py-2 border border-gray-200 rounded-xl"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <div className="flex items-center gap-2 mb-2">
+          <h2 className="text-lg font-semibold">Focus Point Quiz</h2>
+          <div className="relative group">
+            <AiOutlineQuestionCircle
+              className="text-gray-500 cursor-pointer"
+              data-tooltip-id="quiz-focus-tip"
+            />
+            <Tooltip
+              id="quiz-focus-tip"
+              place="right"
+              content={`You can add the focus point that will analyze by AI\n Example: Participants can explain their answers in detail using concise and fundamental language.`}
+            />
+          </div>
+        </div>
+        <textarea
+          placeholder="Write a short description the focus point."
+          className="w-full mb-3 px-4 py-2 border border-gray-200 rounded-xl"
+          value={overallNotes}
+          onChange={(e) => setOverallNotes(e.target.value)}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -279,16 +341,18 @@ const CreateQuiz = () => {
                   Example Answer (optional)
                 </label>
                 <textarea
-                  placeholder="Expected answer(s), comma-separated"
-                  className="w-full mb-3 px-3 py-2 border rounded"
-                  value={q.expectedAnswerRaw || ""}
-                  onChange={(e) =>
+                  placeholder="Expected answer(s), paragraph supported"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl overflow-hidden resize-none"
+                  value={q.expectedAnswer || ""}
+                  onInput={(e) => {
+                    e.target.style.height = "auto";
+                    e.target.style.height = `${e.target.scrollHeight}px`;
                     handleQuestionChange(
                       index,
-                      "expectedAnswerRaw",
+                      "expectedAnswer",
                       e.target.value
-                    )
-                  }
+                    );
+                  }}
                 />
               </>
             )}
@@ -344,19 +408,11 @@ const CreateQuiz = () => {
         <div className="flex justify-end gap-4">
           <button
             onClick={() => {
-              console.log("questions: ", questions);
-            }}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
-          >
-            CHECK
-          </button>
-          <button
-            onClick={() => {
               if (validateQuiz()) {
                 saveQuiz("published");
               }
             }}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
           >
             Publish Quiz
           </button>

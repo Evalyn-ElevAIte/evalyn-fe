@@ -53,6 +53,10 @@ const AppRouter = createBrowserRouter([
         path: "create",
         element: <CreateQuiz />,
       },
+      {
+        path: "success-create",
+        element: <SuccessCreat />,
+      },
     ],
   },
 
