@@ -142,7 +142,10 @@ const Home = () => {
 
     try {
       const joinResponse = await joinQuiz(payload);
-      console.log("joinResponse: ", joinResponse);
+      // console.log("joinResponse: ", joinResponse);
+      if (joinResponse.status == 200) {
+        navigate("/success-join");
+      }
     } catch (error) {
       console.log("error :", error);
     }
