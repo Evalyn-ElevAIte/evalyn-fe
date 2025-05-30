@@ -5,6 +5,7 @@ import { LuSettings } from "react-icons/lu";
 import { RiArrowUpSFill, RiArrowDownSFill } from "react-icons/ri";
 import { BsFillPersonFill } from "react-icons/bs";
 import { NavLink, useNavigate } from "react-router-dom";
+import { FiLogOut } from "react-icons/fi";
 
 const Sidebar = ({ isExpanded, setIsExpanded }) => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -32,6 +33,12 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
       dueDate: "Tuesday, 20 Mei 2025",
     },
   ];
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    localStorage.clear();
+    navigate("/signin");
+  };
 
   return (
     <div
@@ -183,20 +190,29 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
         </nav>
       </div>
 
-      {/* Settings */}
-      <NavLink
-        to="/settings"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-6 py-2 text-sm transition-all duration-200 ${
-            isActive
-              ? "text-blue-600 font-bold border border-[#F2AA32] bg-white rounded-full"
-              : "text-gray-500 hover:text-gray-700"
-          }`
-        }
-      >
-        <LuSettings size={16} />
-        {isExpanded && <span>Settings</span>}
-      </NavLink>
+      <div>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `w-full flex items-center mb-4 gap-6 pl-14 py-4 text-lg text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
+              isActive
+                ? "bg-white text-blue font-bold border border-[#F2AA32]"
+                : "hover:bg-white hover:shadow-sm text-gray-600"
+            }`
+          }
+        >
+          <LuSettings size={18} />
+          {isExpanded && <span>Settings</span>}
+        </NavLink>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center mb-8 gap-6 pl-14 py-4 text-lg text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 hover:bg-white hover:shadow-sm text-red-600"
+        >
+          <FiLogOut size={18} />
+          {isExpanded && <span>Logout</span>}
+        </button>
+      </div>
     </div>
   );
 };

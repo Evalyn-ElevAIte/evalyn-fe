@@ -7,3 +7,8 @@ export const getUser = () => {
   });
 };
 
+export const getAllUserQuizzes = () => {
+  return api.get(`/user/quizzes/all`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

@@ -11,54 +11,67 @@ import {
   Send,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getUser } from "../services/user";
+import { getAllUserQuizzes, getUser } from "../services/user";
 import { useEffect } from "react";
 import { useState } from "react";
 import { joinQuiz } from "../services/quiz";
 
 const Home = () => {
-  const rawDummyActivities = [
-    {
-      day: "Today",
-      type: "My Quizzes",
-      status: "created",
-      quizTitle: "Introduction to Philosophy",
-      message: "Quiz created! Keep an eye on it regularly.",
-      time: "2 hours ago",
-    },
-    {
-      day: "Today",
-      type: "Enrolled",
-      status: "unfinished",
-      quizTitle: "Mathematics Basics",
-      message: "New quiz is out—make sure to complete it on time!",
-      time: "6 hours ago",
-    },
-    {
-      day: "Yesterday",
-      type: "Enrolled",
-      status: "submitted",
-      quizTitle: "Biology 101",
-      message: "Your score is coming soon, hang tight!",
-      time: "1 day ago",
-    },
-    {
-      day: "Yesterday",
-      type: "Enrolled",
-      status: "graded",
-      quizTitle: "Chemistry Fundamentals",
-      message: "Sarah Johnson completed the quiz",
-      time: "1 day ago",
-    },
-    {
-      day: "Yesterday",
-      type: "My Quizzes",
-      status: "done",
-      quizTitle: "Chemistry Fundamentals",
-      message: "All the participant already finish the quiz",
-      time: "1 day ago",
-    },
-  ];
+  // const rawDummyActivities = [
+  //   {
+  //     day: "Today",
+  //     type: "My Quizzes",
+  //     status: "created",
+  //     quizTitle: "Introduction to Philosophy",
+  //     message: "Quiz created! Keep an eye on it regularly.",
+  //     time: "2 hours ago",
+  //   },
+  //   {
+  //     day: "Today",
+  //     type: "Enrolled",
+  //     status: "unfinished",
+  //     quizTitle: "Mathematics Basics",
+  //     message: "New quiz is out—make sure to complete it on time!",
+  //     time: "6 hours ago",
+  //   },
+  //   {
+  //     day: "Yesterday",
+  //     type: "Enrolled",
+  //     status: "submitted",
+  //     quizTitle: "Biology 101",
+  //     message: "Your score is coming soon, hang tight!",
+  //     time: "1 day ago",
+  //   },
+  //   {
+  //     day: "Yesterday",
+  //     type: "Enrolled",
+  //     status: "graded",
+  //     quizTitle: "Chemistry Fundamentals",
+  //     message: "Sarah Johnson completed the quiz",
+  //     time: "1 day ago",
+  //   },
+  //   {
+  //     day: "Yesterday",
+  //     type: "My Quizzes",
+  //     status: "done",
+  //     quizTitle: "Chemistry Fundamentals",
+  //     message: "All the participant already finish the quiz",
+  //     time: "1 day ago",
+  //   },
+  // ];
+
+  const [rawDummyActivities, setRawDummyActivities] = useState([]);
+  const fetchRawActivities = async () => {
+    try {
+      const rawResponse = await getAllUserQuizzes();
+      console.log("rawResponse: ", rawResponse);
+      if (rawResponse.status == 200) {
+        setRawDummyActivities(rawResponse.data);
+      }
+    } catch (error) {
+      console.log("error :", error);
+    }
+  };
 
   const recentActivities = rawDummyActivities.slice(0, 3).map((item, index) => {
     let iconComponent;
@@ -67,47 +80,55 @@ const Home = () => {
     let statusColor;
     let titlePrefix;
 
-    if (item.type === "My Quizzes") {
-      if (item.status === "created") {
-        iconComponent = <FileText size={48} className="text-blue" />;
-        statusText = "New";
-        statusBg = "bg-blue-100";
-        statusColor = "text-blue-700";
-        titlePrefix = "Quiz Created:";
-      } else if (item.status === "done") {
-        iconComponent = <CheckCircle size={48} className="text-green-700" />;
-        statusText = "Completed";
-        statusBg = "bg-green-100";
-        statusColor = "text-green-700";
-        titlePrefix = "Quiz Finished:";
-      }
-    } else if (item.type === "Enrolled") {
-      if (item.status === "unfinished") {
-        iconComponent = <Clock size={48} className="text-orange-500" />;
-        statusText = "Pending";
-        statusBg = "bg-orange-100";
-        statusColor = "text-orange-700";
-        titlePrefix = "New Submission:";
-      } else if (item.status === "submitted") {
-        iconComponent = <Send size={48} className="text-purple-700" />;
-        statusText = "Submitted";
-        statusBg = "bg-purple-100";
-        statusColor = "text-purple-700";
-        titlePrefix = "Quiz Submitted:";
-      } else if (item.status === "graded") {
-        iconComponent = <CheckCircle size={48} className="text-green-700" />;
-        statusText = "Graded";
-        statusBg = "bg-green-100";
-        statusColor = "text-green-700";
-        titlePrefix = "Quiz Graded:";
-      }
+    const isPublished = item.status === null && item.completed === false;
+    const isDone = item.status === null && item.completed === true;
+    const isUnfinished = item.status === "unfinished";
+    const isSubmitted = item.status === "submitted";
+    const isGraded = item.status === "graded";
+
+    if (isPublished) {
+      iconComponent = <FileText size={48} className="text-blue-600" />;
+      statusText = "Published";
+      statusBg = "bg-blue-100";
+      statusColor = "text-blue-700";
+      titlePrefix = "Quiz Created:";
+    } else if (isDone) {
+      iconComponent = <CheckCircle size={48} className="text-green-700" />;
+      statusText = "Completed";
+      statusBg = "bg-green-100";
+      statusColor = "text-green-700";
+      titlePrefix = "Quiz Finished:";
+    } else if (isUnfinished) {
+      iconComponent = <Clock size={48} className="text-orange-500" />;
+      statusText = "Pending";
+      statusBg = "bg-orange-100";
+      statusColor = "text-orange-700";
+      titlePrefix = "New Submission:";
+    } else if (isSubmitted) {
+      iconComponent = <Send size={48} className="text-purple-700" />;
+      statusText = "Submitted";
+      statusBg = "bg-purple-100";
+      statusColor = "text-purple-700";
+      titlePrefix = "Quiz Submitted:";
+    } else if (isGraded) {
+      iconComponent = <CheckCircle size={48} className="text-green-700" />;
+      statusText = "Graded";
+      statusBg = "bg-green-100";
+      statusColor = "text-green-700";
+      titlePrefix = "Quiz Graded:";
+    } else {
+      iconComponent = <FileText size={48} className="text-gray-400" />;
+      statusText = "Unknown";
+      statusBg = "bg-gray-100";
+      statusColor = "text-gray-700";
+      titlePrefix = "Activity:";
     }
 
     return {
       id: index,
       icon: iconComponent,
-      title: `${titlePrefix} ${item.quizTitle}`,
-      description: item.message,
+      title: `${titlePrefix} ${item.title}`,
+      description: item.description,
       status: statusText,
       statusBg: statusBg,
       statusText: statusColor,
@@ -131,6 +152,7 @@ const Home = () => {
   };
   useEffect(() => {
     fetchUserData();
+    fetchRawActivities();
   }, []);
 
   const joinHandle = async () => {

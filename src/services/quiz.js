@@ -18,3 +18,5 @@ export const joinQuiz = (payload) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+

@@ -1,93 +1,148 @@
 import React from "react";
 import { FileText, Clock, CheckCircle, Send, Edit } from "lucide-react";
+import { useState } from "react";
+import { getAllUserQuizzes } from "../services/user";
+import { useEffect } from "react";
 
 const dummyActivities = [
   {
     day: "Today",
-    type: "My Quizzes", // Corresponds to 'You created a new quiz:'
+    type: "My Quizzes",
     status: "created",
     quizTitle: "Introduction to Philosophy",
     message: "Quiz created! Keep an eye on it regularly.",
     time: "2 hours ago",
-    // actions: ["View Quiz"], // Removed actions array
   },
   {
     day: "Today",
-    type: "Enrolled", // Corresponds to 'New submission:'
+    type: "Enrolled",
     status: "unfinished",
     quizTitle: "Mathematics Basics",
     message: "New quiz is out—make sure to complete it on time!",
     time: "6 hours ago",
-    // actions: ["View Quiz"], // Removed actions array
   },
   {
     day: "Yesterday",
-    type: "Enrolled", // Corresponds to 'You have submitted quiz:'
+    type: "Enrolled",
     status: "submitted",
     quizTitle: "Biology 101",
     message: "Your score is coming soon, hang tight!",
     time: "1 day ago",
-    // actions: ["View Quiz"], // Removed actions array
   },
   {
     day: "Yesterday",
-    type: "Enrolled", // Corresponds to 'Your submission has just been graded:'
+    type: "Enrolled",
     status: "graded",
     quizTitle: "Chemistry Fundamentals",
     message: "Sarah Johnson completed the quiz",
     time: "1 day ago",
-    // actions: ["View Quiz"], // Removed actions array
   },
   {
     day: "Yesterday",
-    type: "My Quizzes", // Corresponds to 'You created a new quiz:' (as per image)
-    status: "done", // This status is used for the "All the participant already finish the quiz" message
+    type: "My Quizzes",
+    status: "done",
     quizTitle: "Chemistry Fundamentals",
     message: "All the participant already finish the quiz",
     time: "1 day ago",
-    // actions: ["View Quiz"], // Removed actions array
   },
 ];
+const getDayLabel = (dateString) => {
+  const date = new Date(dateString);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
 
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+
+  if (isSameDay(date, today)) return "Today";
+  if (isSameDay(date, yesterday)) return "Yesterday";
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 const Activities = () => {
-  // Group activities by day
-  const grouped = dummyActivities.reduce((acc, curr) => {
+  const [activities, setActivities] = useState([]);
+
+  const fetchActivities = async () => {
+    try {
+      const activitiesResponse = await getAllUserQuizzes();
+      if (activitiesResponse.status === 200) {
+        const transformed = activitiesResponse.data.map((item) => ({
+          ...item,
+          day: getDayLabel(item.created_at),
+          time: new Date(item.created_at).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        }));
+
+        setActivities(transformed);
+      }
+    } catch (error) {
+      console.log("error :", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivities();
+  }, []);
+
+  const grouped = activities.reduce((acc, curr) => {
     acc[curr.day] = acc[curr.day] || [];
     acc[curr.day].push(curr);
     return acc;
   }, {});
 
-  // Function to determine icon, background color, and text based on activity status and type
   const getIconAndColor = (item) => {
     let iconComponent;
     let iconBgColorClass;
-    let iconColorClass = "text-white"; // Default icon color is white
+    let iconColorClass = "text-white"; // default icon color
     let descriptionText;
+    let messageText;
 
-    if (item.type === "My Quizzes") {
-      if (item.status === "created") {
-        iconComponent = <FileText size={48} />;
-        iconBgColorClass = "bg-blue";
-        descriptionText = "You created a new quiz:";
-      } else if (item.status === "done") {
-        iconComponent = <CheckCircle size={48} />;
-        iconBgColorClass = "bg-green-500";
-        descriptionText = "You created a new quiz:"; // As per image, this is also "You created a new quiz"
-      }
-    } else if (item.type === "Enrolled") {
-      if (item.status === "unfinished") {
-        iconComponent = <Clock size={48} />;
-        iconBgColorClass = "bg-orange-500"; // Using orange for unfinished/new submission
-        descriptionText = "New submission:";
-      } else if (item.status === "submitted") {
-        iconComponent = <Send size={42} />;
-        iconBgColorClass = "bg-purple-500"; // Using purple for submitted
-        descriptionText = "You have submitted quiz:";
-      } else if (item.status === "graded") {
-        iconComponent = <CheckCircle size={48} />;
-        iconBgColorClass = "bg-green-500";
-        descriptionText = "Your submission has just been graded:";
-      }
+    const isPublished = item.status === null && item.completed === false;
+    const isDone = item.status === null && item.completed === true;
+    const isUnfinished = item.status === "unfinished";
+    const isSubmitted = item.status === "submitted";
+    const isGraded = item.status === "graded";
+
+    if (isPublished) {
+      iconComponent = <FileText size={48} />;
+      iconBgColorClass = "bg-blue";
+      descriptionText = "You created a new quiz:";
+      messageText = "Quiz created! Keep an eye on it regularly.";
+    } else if (isDone) {
+      iconComponent = <CheckCircle size={48} />;
+      iconBgColorClass = "bg-green-500";
+      descriptionText = "You created a new quiz:";
+      messageText = "All the participant already finish the quiz.";
+    } else if (isUnfinished) {
+      iconComponent = <Clock size={48} />;
+      iconBgColorClass = "bg-orange-500";
+      descriptionText = "New submission:";
+      messageText = "New quiz is out—make sure to complete it on time!";
+    } else if (isSubmitted) {
+      iconComponent = <Send size={48} />;
+      iconBgColorClass = "bg-purple-500";
+      descriptionText = "You have submitted quiz:";
+      messageText = "Your score is coming soon, hang tight!";
+    } else if (isGraded) {
+      iconComponent = <CheckCircle size={48} />;
+      iconBgColorClass = "bg-green-500";
+      descriptionText = "Your submission has just been graded:";
+      messageText = "Your submission has just graded, check it out!";
+    } else {
+      iconComponent = <FileText size={48} />;
+      iconBgColorClass = "bg-gray-100";
+      iconColorClass = "text-gray-400";
+      descriptionText = "Activity:";
+      messageText = "";
     }
 
     return {
@@ -95,6 +150,7 @@ const Activities = () => {
       iconBgColor: iconBgColorClass,
       iconColor: iconColorClass,
       description: descriptionText,
+      message: messageText,
     };
   };
 
@@ -154,7 +210,7 @@ const Activities = () => {
             <h3 className="text-sm font-semibold text-gray-700 mb-4">{day}</h3>
             <div className="flex flex-col gap-4">
               {items.map((item, index) => {
-                const { icon, iconBgColor, iconColor, description } =
+                const { icon, iconBgColor, iconColor, description, message } =
                   getIconAndColor(item);
                 return (
                   <div
@@ -171,12 +227,10 @@ const Activities = () => {
                         <p className="font-semibold text-gray-800 text-base leading-tight">
                           {description}{" "}
                           <span className="text-black font-bold">
-                            {item.quizTitle}
+                            {item.title}
                           </span>
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {item.message}
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">{message}</p>
                       </div>
                     </div>
 
