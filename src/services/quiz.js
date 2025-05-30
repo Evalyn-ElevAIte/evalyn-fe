@@ -6,3 +6,9 @@ export const creatQuizWithQuestions = (payload) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const getQuizById = (id) => {
+  return api.get(`/quiz/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

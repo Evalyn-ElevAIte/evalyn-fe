@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import { creatQuizWithQuestions } from "../services/quiz";
+import { useNavigate } from "react-router-dom";
 
 const initialQuestion = {
   question: "",
@@ -13,6 +14,8 @@ const initialQuestion = {
 };
 
 const CreateQuiz = () => {
+  const navigate = useNavigate();
+
   const [quizTitle, setQuizTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -146,8 +149,10 @@ const CreateQuiz = () => {
     try {
       const createResponse = await creatQuizWithQuestions(payload);
       console.log("createResponse: ", createResponse);
-      // if (createResponse.status == 200) {
-      // }
+      if (createResponse.status == 200) {
+        const quiz_id = createResponse.data.quiz_id;
+        navigate(`/success-create/${quiz_id}`);
+      }
     } catch (error) {
       console.log("error :", error);
     }
