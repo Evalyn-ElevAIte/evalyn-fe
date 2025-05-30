@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import Activities from "./pages/Activities";
 import MyQuizzes from "./pages/MyQuizzes";
 import CreateQuiz from "./pages/CreateQuiz";
+import SuccessCreate from "./pages/SuccessCreate";
 
 const AppRouter = createBrowserRouter([
   // Landing page at root
@@ -55,7 +56,7 @@ const AppRouter = createBrowserRouter([
       },
       {
         path: "success-create",
-        element: <SuccessCreat />,
+        element: <SuccessCreate />,
       },
     ],
   },
