@@ -6,3 +6,4 @@ export const getUser = () => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+

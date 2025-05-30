@@ -12,3 +12,9 @@ export const getQuizById = (id) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const joinQuiz = (payload) => {
+  return api.post(`/quiz_participants/join-by-code`, payload, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

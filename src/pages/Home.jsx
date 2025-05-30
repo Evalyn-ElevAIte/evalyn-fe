@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { getUser } from "../services/user";
 import { useEffect } from "react";
 import { useState } from "react";
+import { joinQuiz } from "../services/quiz";
 
 const Home = () => {
   const rawDummyActivities = [
@@ -115,6 +116,7 @@ const Home = () => {
 
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
 
   const fetchUserData = async () => {
     try {
@@ -131,6 +133,20 @@ const Home = () => {
     fetchUserData();
   }, []);
 
+  const joinHandle = async () => {
+    const payload = {
+      join_code: joinCode,
+    };
+
+    console.log("payload: ", payload);
+
+    try {
+      const joinResponse = await joinQuiz(payload);
+      console.log("joinResponse: ", joinResponse);
+    } catch (error) {
+      console.log("error :", error);
+    }
+  };
   const createQuizHandle = () => {
     navigate("/create");
   };
@@ -175,8 +191,15 @@ const Home = () => {
               type="text"
               placeholder="Enter quiz code..."
               className="border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={joinCode}
+              onChange={(e) => {
+                setJoinCode(e.target.value);
+              }}
             />
-            <button className="bg-blue hover:bg-blue-600 text-white px-6 py-3 rounded font-medium cursor-pointer flex gap-4 items-center">
+            <button
+              onClick={joinHandle}
+              className="bg-blue hover:bg-blue-600 text-white px-6 py-3 rounded font-medium cursor-pointer flex gap-4 items-center"
+            >
               <CiLogin size={24} className="text-white" />
               Join
             </button>

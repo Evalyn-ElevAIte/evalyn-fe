@@ -71,7 +71,15 @@ const CreateQuiz = () => {
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { ...initialQuestion }]);
+    const newQuestion = {
+      question: "",
+      type: "text",
+      options: ["", "", "", ""],
+      expectedAnswer: [],
+      rubric: "",
+      rubricMaxScore: 10,
+    };
+    setQuestions([...questions, newQuestion]);
   };
 
   const removeQuestion = (index) => {
@@ -127,7 +135,7 @@ const CreateQuiz = () => {
           ? "text"
           : q.type === "single"
           ? "single_choice"
-          : "multiple_choice",
+          : "multi_choice",
       options:
         q.type === "text" ? [] : q.options.filter((opt) => opt.trim() !== ""),
       expected_answer:
@@ -157,6 +165,41 @@ const CreateQuiz = () => {
       console.log("error :", error);
     }
     // console.log("Saving quiz:", payload);
+  };
+
+  const checkPayload = () => {
+    const end_time = new Date(`${dueDate}T${dueTime}`).toISOString();
+
+    const start_time = new Date().toISOString();
+
+    const transformedQuestions = questions.map((q) => ({
+      text: q.question,
+      type:
+        q.type === "text"
+          ? "text"
+          : q.type === "single"
+          ? "single_choice"
+          : "multi_choice",
+      options:
+        q.type === "text" ? [] : q.options.filter((opt) => opt.trim() !== ""),
+      expected_answer:
+        q.type === "text" ? [q.expectedAnswer || ""] : q.expectedAnswer,
+      rubric: q.rubric,
+      rubric_max_score: q.rubricMaxScore,
+    }));
+
+    const payload = {
+      title: quizTitle,
+      description: description,
+      start_time: start_time,
+      end_time: end_time,
+      duration: parseInt(duration),
+      questions: transformedQuestions,
+      completed: false,
+      lecturer_overall_notes: overallNotes,
+    };
+
+    console.log("payload: ", payload);
   };
 
   return (
@@ -424,7 +467,7 @@ const CreateQuiz = () => {
 
           <button
             onClick={() => {
-              saveQuiz("published");
+              checkPayload();
             }}
             className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
           >
