@@ -6,10 +6,15 @@ import { RiArrowUpSFill, RiArrowDownSFill } from "react-icons/ri";
 import { BsFillPersonFill } from "react-icons/bs";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
+import { getUserQuizzes, getUserQuizzesCreator } from "../services/user";
+import { useEffect } from "react";
 
 const Sidebar = ({ isExpanded, setIsExpanded }) => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isEnrolledOpen, setIsEnrolledOpen] = useState(false);
+
+  const [myQuizzes, setMyQuizzes] = useState([]);
+  const [enrolledQuizzes, setEnrolledQuizzes] = useState([]);
 
   const navigate = useNavigate();
 
@@ -39,6 +44,35 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
     localStorage.clear();
     navigate("/signin");
   };
+
+  const fetchMyQuizzes = async () => {
+    try {
+      const myQuizzesResponse = await getUserQuizzes();
+      // console.log("myQuizzesResponse: ", myQuizzesResponse);
+      if (myQuizzesResponse.status == 200) {
+        setEnrolledQuizzes(myQuizzesResponse.data);
+      }
+    } catch (error) {
+      console.log("error :", error);
+    }
+  };
+
+  const fetchMyQuizzesCreator = async () => {
+    try {
+      const myQuizzesCreatorResponse = await getUserQuizzesCreator();
+      // console.log("myQuizzesResponse: ", myQuizzesResponse);
+      if (myQuizzesCreatorResponse.status == 200) {
+        setMyQuizzes(myQuizzesCreatorResponse.data);
+      }
+    } catch (error) {
+      console.log("error :", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMyQuizzes();
+    fetchMyQuizzesCreator();
+  }, []);
 
   return (
     <div
@@ -113,7 +147,7 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
 
           {isExpanded && isQuizOpen && (
             <div className="ml-14 mt-4 space-y-3">
-              {dummyQuizzes.map((quiz, index) => (
+              {myQuizzes.map((quiz, index) => (
                 <div
                   key={index}
                   className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"
@@ -167,7 +201,7 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
 
           {isExpanded && isEnrolledOpen && (
             <div className="ml-14 mt-4 space-y-3">
-              {enrolledCourses.map((course, index) => (
+              {enrolledQuizzes.map((course, index) => (
                 <div
                   key={index}
                   className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"

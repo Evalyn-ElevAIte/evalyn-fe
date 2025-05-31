@@ -12,6 +12,7 @@ import MyQuizzes from "./pages/MyQuizzes";
 import CreateQuiz from "./pages/CreateQuiz";
 import SuccessCreate from "./pages/SuccessCreate";
 import SuccessJoin from "./pages/SuccessJoin";
+import QuizInfo from "./pages/QuizInfo";
 
 const AppRouter = createBrowserRouter([
   // Landing page at root
@@ -62,6 +63,10 @@ const AppRouter = createBrowserRouter([
       {
         path: "success-join",
         element: <SuccessJoin />,
+      },
+      {
+        path: "quiz-info/:quiz_id",
+        element: <QuizInfo />,
       },
     ],
   },

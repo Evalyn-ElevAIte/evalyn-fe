@@ -12,3 +12,15 @@ export const getAllUserQuizzes = () => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const getUserQuizzes = () => {
+  return api.get(`/user/quizzes`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getUserQuizzesCreator = () => {
+  return api.get(`user/quizzes_creator`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
