@@ -13,6 +13,7 @@ import CreateQuiz from "./pages/CreateQuiz";
 import SuccessCreate from "./pages/SuccessCreate";
 import SuccessJoin from "./pages/SuccessJoin";
 import QuizInfo from "./pages/QuizInfo";
+import QuizStartPage from "./pages/QuizStartPage";
 
 const AppRouter = createBrowserRouter([
   // Landing page at root
@@ -67,6 +68,10 @@ const AppRouter = createBrowserRouter([
       {
         path: "quiz-info/:quiz_id",
         element: <QuizInfo />,
+      },
+      {
+        path: "start-quiz/:quiz_id",
+        element: <QuizStartPage />,
       },
     ],
   },

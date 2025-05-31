@@ -3,6 +3,7 @@ import { FileText, Clock, CheckCircle, Send, Edit } from "lucide-react";
 import { useState } from "react";
 import { getAllUserQuizzes } from "../services/user";
 import { useEffect } from "react";
+import LoadingScreen from "../components/LoadingScreen";
 
 const dummyActivities = [
   {
@@ -154,8 +155,12 @@ const Activities = () => {
     };
   };
 
+  if (activities.length === 0) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <div className="">
+    <div className=" pt-8">
       <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Recent Activity
@@ -225,7 +230,7 @@ const Activities = () => {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-800 text-base leading-tight">
-                          {description}{" "}
+                          {description}
                           <span className="text-black font-bold">
                             {item.title}
                           </span>
@@ -234,7 +239,7 @@ const Activities = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-end md:items-center gap-2 mt-4 md:mt-0 md:ml-4 flex-shrink-0">
+                    <div className="flex flex-col md:flex-row items-end md:items-center gap-2 mt-4 md:mt-0 md:ml-4 flex-shrink-0 p-8">
                       <button className="text-blue hover:text-blue-200 cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors duration-200">
                         View Quiz
                       </button>

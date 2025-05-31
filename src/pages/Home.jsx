@@ -15,6 +15,7 @@ import { getAllUserQuizzes, getUser } from "../services/user";
 import { useEffect } from "react";
 import { useState } from "react";
 import { joinQuiz } from "../services/quiz";
+import LoadingScreen from "../components/LoadingScreen";
 
 const Home = () => {
   // const rawDummyActivities = [
@@ -175,8 +176,13 @@ const Home = () => {
   const createQuizHandle = () => {
     navigate("/create");
   };
+
+  if (!userName || recentActivities.length === 0) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <div className="min-h-screen bg-white px-6 py-8 font-sans text-gray-800">
+    <div className="min-h-screen bg-white px-6 py-20 font-sans text-gray-800">
       <h1 className="text-2xl font-semibold mb-1">
         Hi, {userName} <span className="inline-block">👋</span>
       </h1>

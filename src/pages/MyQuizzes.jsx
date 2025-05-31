@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserQuizzes, getUserQuizzesCreator } from "../services/user";
+import LoadingScreen from "../components/LoadingScreen";
 
 const dummyQuizzes = [
   {
@@ -87,6 +88,10 @@ const MyQuizzes = () => {
       // console.log("myQuizzesResponse: ", myQuizzesResponse);
       if (myQuizzesCreatorResponse.status == 200) {
         setMyQuizzes(myQuizzesCreatorResponse.data);
+        console.log(
+          "myQuizzesCreatorResponse.data: ",
+          myQuizzesCreatorResponse.data
+        );
       }
     } catch (error) {
       console.log("error :", error);
@@ -110,10 +115,17 @@ const MyQuizzes = () => {
   const createQuizHandle = () => {
     navigate(`/create`);
   };
+
+  if (myQuizzes.length === 0 && enrolledQuizzes.length === 0) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="">
       <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">My Quizzes</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2 pt-8">
+          My Quizzes
+        </h2>
         <p className="text-sm text-gray-600">
           Manage your quizzes and view student submissions.
         </p>

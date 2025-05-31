@@ -4,6 +4,7 @@ import QuizInfoTab from "./tabs/QuizInfoTab";
 import PeopleTab from "./tabs/PeopleTab";
 import GradesTab from "./tabs/GradesTab";
 import { getQuizById } from "../services/quiz";
+import LoadingScreen from "../components/LoadingScreen";
 
 const QuizInfo = () => {
   const { quiz_id } = useParams();
@@ -17,6 +18,7 @@ const QuizInfo = () => {
         const response = await getQuizById(quiz_id);
         if (response.status === 200) {
           setQuizData(response.data);
+          console.log("quizData: ", response.data);
         }
       } catch (error) {
         console.error("Failed to fetch quiz:", error);
@@ -43,12 +45,19 @@ const QuizInfo = () => {
     }
   }, [quizData]);
 
+  const getStatus = () => {
+    return (
+      quizData.status || (quizData.completed === true ? "done" : "published")
+    );
+  };
+
   const renderTab = () => {
+    const status = getStatus();
     switch (activeTab) {
       case "info":
-        return <QuizInfoTab quiz={quizData} />;
+        return <QuizInfoTab quizData={quizData} status={status} />;
       case "people":
-        return <PeopleTab quizId={quizData.id} />;
+        return <PeopleTab quizId={quizData.id} status={status} />;
       case "grades":
         return <GradesTab quizId={quizData.id} />;
       default:
@@ -63,20 +72,20 @@ const QuizInfo = () => {
   };
 
   if (!quizData) {
-    return <div className="p-4">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   return (
-    <div className="quiz-info">
+    <div className="quiz-info pt-12">
       <div className="flex border-b border-gray-200">
         {availableTabs.map((tabKey) => (
           <button
             key={tabKey}
             onClick={() => setActiveTab(tabKey)}
-            className={`px-4 py-2 font-semibold border-b-2 transition-colors duration-200 ${
+            className={`px-4 py-2 text-lg font-semibold border-b-3 transition-colors duration-200 ${
               activeTab === tabKey
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-blue-600"
+                ? "border-blue text-blue-600"
+                : "border-transparent text-gray-300 hover:text-blue-600 cursor-pointer"
             }`}
           >
             {tabLabel[tabKey]}
