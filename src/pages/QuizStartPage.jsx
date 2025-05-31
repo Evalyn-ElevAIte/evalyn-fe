@@ -6,6 +6,7 @@ import {
   getQuizWithQuestions,
   submitAllAnswers,
 } from "../services/student_answer";
+import { analyzeQuiz } from "../services/ai";
 
 const QuizStartPage = () => {
   const { quiz_id } = useParams();
@@ -70,7 +71,7 @@ const QuizStartPage = () => {
     try {
       const res = await Promise.all([
         submitAllAnswers(payload),
-        analyzeQuiz(quizData.id, payload),
+        // analyzeQuiz(quizData.id, payload),
       ]);
       console.log("res: ", res);
       if (res.status === 200) {
