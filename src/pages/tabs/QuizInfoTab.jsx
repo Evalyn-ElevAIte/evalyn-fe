@@ -1,6 +1,7 @@
 import React from "react";
 import UnfinishedQuizInfo from "../quiz_info_content/UnfinishedQuizInfo";
 import SubmittedQuizInfo from "../quiz_info_content/SubmittedQuizInfo";
+import PublishedQuizInfo from "../quiz_info_content/PublishedQuizInfo";
 
 const QuizInfoTab = ({ status, quizData }) => {
   if (!quizData) {
@@ -23,13 +24,7 @@ const QuizInfoTab = ({ status, quizData }) => {
         </div>
       );
     case "published":
-      return (
-        <div>
-          <h2 className="text-xl font-bold mb-2">{quizData.title}</h2>
-          <p className="text-gray-700 mb-4">{quizData.description}</p>
-          <p className="text-blue-600">This quiz is live for students.</p>
-        </div>
-      );
+      return <PublishedQuizInfo quiz={quizData} />;
     case "done":
       return (
         <div>

@@ -15,6 +15,7 @@ import SuccessJoin from "./pages/SuccessJoin";
 import QuizInfo from "./pages/QuizInfo";
 import QuizStartPage from "./pages/QuizStartPage";
 import SuccessSubmit from "./pages/SuccessSubmit";
+import AssessmentResultPage from "./pages/AssessmentResultPage";
 
 const AppRouter = createBrowserRouter([
   // Landing page at root
@@ -77,6 +78,10 @@ const AppRouter = createBrowserRouter([
       {
         path: "/success-submit",
         element: <SuccessSubmit />,
+      },
+      {
+        path: "quiz/assessment-result",
+        element: <AssessmentResultPage />,
       },
     ],
   },

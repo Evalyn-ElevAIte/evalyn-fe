@@ -3,6 +3,7 @@ import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import { creatQuizWithQuestions } from "../services/quiz";
 import { useNavigate } from "react-router-dom";
+import LoadingScreen from "../components/LoadingScreen";
 
 const initialQuestion = {
   question: "",
@@ -23,6 +24,8 @@ const CreateQuiz = () => {
   const [duration, setDuration] = useState("");
   const [questions, setQuestions] = useState([initialQuestion]);
   const [overallNotes, setOverallNotes] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleQuestionChange = (index, field, value) => {
     const updated = [...questions];
@@ -124,6 +127,7 @@ const CreateQuiz = () => {
     return true;
   };
   const saveQuiz = async () => {
+    setIsLoading(true);
     const end_time = new Date(`${dueDate}T${dueTime}`).toISOString();
 
     const start_time = new Date().toISOString();
@@ -163,6 +167,8 @@ const CreateQuiz = () => {
       }
     } catch (error) {
       console.log("error :", error);
+    } finally {
+      setIsLoading(false);
     }
     // console.log("Saving quiz:", payload);
   };
@@ -201,6 +207,8 @@ const CreateQuiz = () => {
 
     console.log("payload: ", payload);
   };
+
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <div className=" mx-auto">
@@ -438,7 +446,7 @@ const CreateQuiz = () => {
             <div className="text-right mt-3">
               <button
                 onClick={() => removeQuestion(index)}
-                className="text-red-500 text-sm hover:underline"
+                className="text-red-500 text-sm hover:underline cursor-pointer"
               >
                 Remove Question
               </button>
@@ -448,7 +456,7 @@ const CreateQuiz = () => {
 
         <button
           onClick={addQuestion}
-          className="text-blue-600 border border-blue-600 px-4 py-2 rounded mb-6 hover:bg-blue-50"
+          className="text-blue cursor-pointer border border-blue px-4 py-2 rounded mb-6 hover:bg-blue-50"
         >
           + Add Question
         </button>
@@ -460,19 +468,19 @@ const CreateQuiz = () => {
                 saveQuiz("published");
               }
             }}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            className="px-4 py-2 rounded bg-blue text-white hover:bg-blue-600 cursor-pointer"
           >
             Publish Quiz
           </button>
 
-          <button
+          {/* <button
             onClick={() => {
               checkPayload();
             }}
-            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+            className="px-4 py-2 rounded bg-blue text-white hover:bg-blue-600"
           >
             Check
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

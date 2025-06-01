@@ -1,10 +1,10 @@
-// src/pages/tabs/PeopleTab.jsx
 import React, { useEffect, useState } from "react";
-// import { getPeopleList } from "../../services/quiz";
 import LoadingScreen from "../../components/LoadingScreen";
 import { formatDistanceToNow } from "date-fns";
-import { getAllStudentsAssessments } from "../../services/assessments";
 import { FaChevronRight } from "react-icons/fa";
+import { BsPencilSquare } from "react-icons/bs";
+import { getAssessmentById } from "../../services/assessments";
+import { useNavigate } from "react-router-dom";
 
 const getStatusLabel = (status) => {
   switch (status) {
@@ -30,31 +30,32 @@ const getStatusLabel = (status) => {
       return <span className="text-xs text-gray-400">Unknown</span>;
   }
 };
+
 const PeopleTab = ({ quizId, status, people }) => {
-  // const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const fetchPeople = async () => {
-  //     try {
-  //       const response = await getAllStudentsAssessments(quizId);
-  //       if (response.status === 200) {
-  //         setPeople(response.data.assessments);
-  //         console.log("response.data: ", response.data.assessments);
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to load people list:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchPeople();
-  // }, [quizId]);
+  const handleViewDetails = async (person) => {
+    try {
+      setLoading(true);
+      const res = await getAssessmentById(person.assessment_id);
+      if (res.status === 200) {
+        navigate("/quiz/assessment-result", {
+          state: {
+            result: res.data,
+            studentName: person.student_name,
+          },
+        });
+      }
+    } catch (e) {
+      console.error("Failed to load assessment detail", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <LoadingScreen />;
 
-  // Teacher view
   if (status === "published" || status === "done") {
     return (
       <div className="overflow-x-auto border rounded-lg">
@@ -102,18 +103,34 @@ const PeopleTab = ({ quizId, status, people }) => {
                     : "—"}
                 </td>
                 <td className="p-4 text-sm text-blue-700 font-semibold">
-                  {person.status === "graded"
+                  {person.status === "graded" || person.status === "submited"
                     ? `${Math.round(person.score_percentage)} / 100`
                     : "—"}
                 </td>
                 <td className="p-4">{getStatusLabel(person.status)}</td>
                 <td className="p-4">
-                  <button
-                    onClick={() => onViewDetails(person)}
-                    className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-                  >
-                    View Details <FaChevronRight className="text-xs mt-0.5" />
-                  </button>
+                  {person.status === "graded" && (
+                    <button
+                      onClick={() => handleViewDetails(person)}
+                      className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                    >
+                      View Details <FaChevronRight className="text-xs mt-0.5" />
+                    </button>
+                  )}
+                  {person.status === "submited" && (
+                    <div>
+                      <button
+                        onClick={() => handleViewDetails(person)}
+                        className="inline-flex items-center gap-2 cursor-pointer bg-orange text-yellow-700 font-medium text-sm px-4 py-2 rounded-lg hover:bg-yellow-200 transition"
+                      >
+                        <BsPencilSquare className="text-white" />
+                        Give Grades
+                      </button>
+                      <div className="text-xs text-red-500 mt-1">
+                        ⚠ Please grade this participant.
+                      </div>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
@@ -123,7 +140,6 @@ const PeopleTab = ({ quizId, status, people }) => {
     );
   }
 
-  // Participant view
   return (
     <div className="space-y-4">
       {people.map((person) => (

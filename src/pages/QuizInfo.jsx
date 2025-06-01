@@ -15,7 +15,7 @@ const QuizInfo = () => {
   const [activeTab, setActiveTab] = useState("info");
   const [availableTabs, setAvailableTabs] = useState([]);
 
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   const fetchPeople = async () => {
     try {
@@ -27,7 +27,7 @@ const QuizInfo = () => {
     } catch (error) {
       console.error("Failed to load people list:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -65,12 +65,14 @@ const QuizInfo = () => {
   }, [quizData]);
 
   const getStatus = () => {
+    if (!quizData) return "";
     return (
       quizData.status || (quizData.completed === true ? "done" : "published")
     );
   };
 
   const renderTab = () => {
+    if (!quizData) return <LoadingScreen />;
     const status = getStatus();
     switch (activeTab) {
       case "info":
@@ -92,9 +94,9 @@ const QuizInfo = () => {
     grades: "Grades",
   };
 
-  if (isLoading || !quizData) {
-    return <LoadingScreen />;
-  }
+  // if (isLoading || !quizData) {
+  //   return <LoadingScreen />;
+  // }
 
   return (
     <div className="quiz-info pt-12">

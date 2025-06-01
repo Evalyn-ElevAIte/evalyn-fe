@@ -1,0 +1,137 @@
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import LoadingScreen from "../components/LoadingScreen";
+
+const AssessmentResultPage = () => {
+  const location = useLocation();
+  const result = location.state?.result;
+  const studentName = location.state?.studentName;
+
+  if (!result) return <LoadingScreen />;
+  console.log("result: ", result);
+
+  const getScoreColor = (score) => {
+    if (score >= 80) return "bg-green-500";
+    if (score >= 50) return "bg-yellow-400";
+    return "bg-red-500";
+  };
+
+  const overallPercentage = Math.round(
+    (result.overall_score / result.overall_max_score) * 100
+  );
+
+  return (
+    <div className="max-w-[1450px] mx-auto pt-16 px-4">
+      <h2 className="text-2xl font-bold mb-6">AI Analysis Result</h2>
+
+      {/* Summary Box */}
+      <div className="bg-white rounded-xl shadow p-6 mb-6 flex justify-between items-center">
+        <div>
+          <p className="text-sm text-gray-800 font-semibold">
+            Student: {studentName}
+          </p>
+          <p className="text-sm text-gray-500">
+            Submitted:{" "}
+            {new Date(result.submission_timestamp_utc).toLocaleString()}
+          </p>
+        </div>
+
+        <div className="text-center">
+          <p className="text-blue-600 text-4xl font-bold">
+            {overallPercentage}/100
+          </p>
+          <div className="w-40 mt-2 h-2 bg-blue-100 rounded-full">
+            <div
+              className="h-2 bg-blue-500 rounded-full"
+              style={{ width: `${overallPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-green-600 font-medium">
+              AI Evaluation Status: Completed
+            </span>
+            <span className="bg-blue-50 text-blue-500 px-3 py-1 text-xs rounded-full">
+              AI Insights Enabled
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {result.question_assessments.map((q, idx) => (
+        <div
+          key={q.id}
+          className="bg-white border border-gray-200 rounded-xl p-6 mb-6"
+        >
+          <h3 className="font-semibold text-sm mb-2">
+            Question {idx + 1}: {q.question_text}
+          </h3>
+
+          <div className="bg-gray-50 border rounded p-3 text-sm mb-3">
+            {q.student_answer_text ? (
+              <p>{q.student_answer_text}</p>
+            ) : (
+              <em className="text-gray-400">No answer provided.</em>
+            )}
+          </div>
+
+          <div className="bg-blue-50 border border-blue-100 p-4 rounded text-sm">
+            <div className="mb-2">
+              <p className="font-semibold mb-1">Missing Concepts:</p>
+              <ul className="list-disc list-inside text-red-500">
+                {q.missing_concepts.map((m) => (
+                  <li key={m.id}>{m.missing_concept}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-4">
+              <div className="flex justify-between mb-1 text-sm font-medium text-gray-600">
+                <span>Relevance to Question</span>
+                <span>
+                  {q.score}/{q.max_score_possible}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div
+                  className={`h-2.5 rounded-full ${getScoreColor(
+                    (q.score / q.max_score_possible) * 100
+                  )}`}
+                  style={{
+                    width: `${(q.score / q.max_score_possible) * 100}%`,
+                  }}
+                ></div>
+              </div>
+
+              <p className="mt-1 text-sm text-gray-700">
+                Answer Quality:{" "}
+                <span className="font-semibold text-green-700">Good</span>
+              </p>
+            </div>
+          </div>
+
+          <p className="text-xs italic text-gray-500 mt-3">
+            "{q.overall_question_feedback}"
+          </p>
+        </div>
+      ))}
+
+      <div className="bg-white rounded-xl shadow p-6">
+        <h3 className="text-lg font-semibold mb-2">Final Feedback Summary</h3>
+        <p className="text-sm text-gray-700 mb-1">
+          {result.summary_of_performance}
+        </p>
+        <p className="text-sm text-green-700 mt-2">
+          {result.general_positive_feedback}
+        </p>
+        <p className="text-sm text-yellow-700 mt-1">
+          {result.general_areas_for_improvement}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default AssessmentResultPage;

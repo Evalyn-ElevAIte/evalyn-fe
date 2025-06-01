@@ -84,7 +84,7 @@ const SuccessCreate = ({
           </button> */}
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer"
-            onClick={() => navigate("/quiz-details")}
+            onClick={() => navigate(`/quiz-info/${quiz_id}`)}
           >
             View Quiz Details
           </button>

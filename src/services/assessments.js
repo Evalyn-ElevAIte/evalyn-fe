@@ -6,3 +6,7 @@ export const getAllStudentsAssessments = (quiz_id) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const getAssessmentById = (assesment_id) => {
+  return api.get(`/assesment/${assesment_id}`);
+};

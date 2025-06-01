@@ -98,18 +98,23 @@ const QuizStartPage = () => {
     };
 
     try {
-      const [submitRes, analyzeRes] = await Promise.all([
-        submitAllAnswers(payload),
-        analyzeQuiz(quizData.id, payload),
-      ]);
+      const submitRes = await submitAllAnswers(payload);
 
-      if (submitRes.status === 200 && analyzeRes.status === 200) {
-        navigate("/success-submit", { state: { title: quizData.title } });
+      if (submitRes.status === 200) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
+        const analyzeRes = await analyzeQuiz(quizData.id, payload);
+
+        if (analyzeRes.status === 200) {
+          navigate("/success-submit", { state: { title: quizData.title } });
+        } else {
+          console.error("Analyze request failed:", analyzeRes);
+        }
       } else {
-        console.error("One of the requests failed:", submitRes, analyzeRes);
+        console.error("Submit request failed:", submitRes);
       }
     } catch (error) {
-      console.error("Submit error:", error);
+      console.error("Submit or analyze error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -208,6 +213,28 @@ const QuizStartPage = () => {
       >
         Submit Quiz
       </button>
+
+      {/* <button
+        onClick={() => {
+          const payload = {
+            quiz_id: quizData.id,
+            title: quizData.title,
+            description: quizData.description,
+            responses: quizData.questions.map((q) => ({
+              question_id: q.id,
+              answer: {
+                [q.type]:
+                  answers[q.id] || (q.type === "multi_choice" ? [] : ""),
+              },
+            })),
+          };
+
+          console.log("payload: ", payload);
+        }}
+        className="bg-blue cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+      >
+        CHECKKKKK GEMINX
+      </button> */}
     </div>
   );
 };
