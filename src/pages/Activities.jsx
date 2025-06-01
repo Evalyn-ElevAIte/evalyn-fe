@@ -3,6 +3,7 @@ import { FileText, Clock, CheckCircle, Send, Edit } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getAllUserQuizzes } from "../services/user";
 import LoadingScreen from "../components/LoadingScreen";
+import { useNavigate } from "react-router-dom";
 
 const getDayLabel = (dateString) => {
   const date = new Date(dateString);
@@ -26,6 +27,7 @@ const getDayLabel = (dateString) => {
 };
 
 const Activities = () => {
+  const navigate = useNavigate();
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -123,6 +125,9 @@ const Activities = () => {
       message: messageText,
     };
   };
+  const viewQuizHandle = (quiz_id) => {
+    navigate(`/quiz-info/${quiz_id}`);
+  };
 
   if (isLoading) return <LoadingScreen />;
 
@@ -216,7 +221,12 @@ const Activities = () => {
                       </div>
 
                       <div className="flex flex-col md:flex-row items-end md:items-center gap-2 mt-4 md:mt-0 md:ml-4 flex-shrink-0 p-8">
-                        <button className="text-blue hover:text-blue-200 cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors duration-200">
+                        <button
+                          onClick={() => {
+                            viewQuizHandle(item.id);
+                          }}
+                          className="text-blue hover:text-blue-200 cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors duration-200"
+                        >
                           View Quiz
                         </button>
                         <span className="text-xs text-gray-400 md:ml-4 whitespace-nowrap">

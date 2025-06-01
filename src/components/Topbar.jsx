@@ -5,9 +5,32 @@ import EvalynLogo from "../assets/logo/evalyn_logo.png";
 import DummyPhoto from "../assets/images/dummy_profile.jpg";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { getUser } from "../services/user";
 
 const Topbar = ({ isExpanded, setIsExpanded }) => {
   const [hasNotification, setHasNotification] = useState(true);
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const userResponse = await Promise.all([getUser()]);
+        console.log("userResponse: ", userResponse);
+        if (userResponse.status === 200) {
+          setUserName(userResponse.data.name);
+        }
+
+        console.log("userResponse.data.name: ", userResponse.data.name);
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setRawDummyActivities([]);
+      } finally {
+      }
+    };
+
+    fetchAll();
+  }, []);
 
   return (
     <div className="fixed top-0 w-full">
@@ -40,9 +63,11 @@ const Topbar = ({ isExpanded, setIsExpanded }) => {
           </div>
 
           <img
-            src={DummyPhoto}
-            alt="Profile"
-            className="w-14 h-14 rounded-full object-cover cursor-pointer"
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+              userName
+            )}&background=random`}
+            alt={userName}
+            className="w-10 h-10 rounded-full object-cover"
           />
         </div>
       </div>

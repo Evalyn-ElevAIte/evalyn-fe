@@ -184,17 +184,28 @@ const AssessmentResultPage = () => {
       ))}
 
       {/* Summary Section */}
-      <div className="bg-white rounded-xl shadow p-6 mb-6">
-        <h3 className="text-lg font-semibold mb-2">Final Feedback Summary</h3>
-        <p className="text-sm text-gray-700 mb-1">
-          {result.summary_of_performance}
-        </p>
-        <p className="text-sm text-green-700 mt-2">
-          {result.general_positive_feedback}
-        </p>
-        <p className="text-sm text-yellow-700 mt-1">
-          {result.general_areas_for_improvement}
-        </p>
+      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 space-y-4">
+        <h3 className="text-xl font-bold text-gray-800">
+          Final Feedback Summary
+        </h3>
+
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+          <p className="text-sm text-red-700">
+            {result.summary_of_performance}
+          </p>
+        </div>
+
+        <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+          <p className="text-sm text-green-800">
+            {result.general_positive_feedback}
+          </p>
+        </div>
+
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+          <p className="text-sm text-yellow-800">
+            {result.general_areas_for_improvement}
+          </p>
+        </div>
       </div>
 
       <div className="text-end">
