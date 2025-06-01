@@ -71,7 +71,7 @@ const QuizStartPage = () => {
     try {
       const res = await Promise.all([
         submitAllAnswers(payload),
-        // analyzeQuiz(quizData.id, payload),
+        analyzeQuiz(quizData.id, payload),
       ]);
       console.log("res: ", res);
       if (res.status === 200) {

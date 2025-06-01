@@ -110,7 +110,7 @@ const Activities = () => {
     const isPublished = item.status === null && item.completed === false;
     const isDone = item.status === null && item.completed === true;
     const isUnfinished = item.status === "unfinished";
-    const isSubmitted = item.status === "submitted";
+    const isSubmitted = item.status === "submited";
     const isGraded = item.status === "graded";
 
     if (isPublished) {
