@@ -52,13 +52,13 @@ const QuizInfo = () => {
 
     if (!quizData.status && quizData.completed !== null) {
       // Teacher
-      setAvailableTabs(["info", "people"]); //grades is saved first
+      setAvailableTabs(["info", "people"]);//grades is saved first
     } else if (quizData.status === "unfinished") {
       setAvailableTabs(["info", "people"]);
     } else if (quizData.status === "submited") {
       setAvailableTabs(["info", "people"]);
     } else if (quizData.status === "graded") {
-      setAvailableTabs(["info", "people"]); //grades is saved first
+      setAvailableTabs(["info", "people", "grades"]); //grades is saved first
     } else {
       setAvailableTabs(["info"]);
     }

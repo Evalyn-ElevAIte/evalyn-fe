@@ -16,3 +16,7 @@ export const updateAssessmentGrading = (assesment_id, payload) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const getQuizStatistics = (quiz_id) => {
+  return api.get(`/assesment/quiz/${quiz_id}/statistics`);
+};

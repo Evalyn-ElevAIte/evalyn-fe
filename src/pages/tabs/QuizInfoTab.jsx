@@ -8,8 +8,6 @@ const QuizInfoTab = ({ status, quizData }) => {
     return <div>No quiz data available.</div>;
   }
 
-  console.log("status: ", status);
-
   switch (status) {
     case "unfinished":
       return <UnfinishedQuizInfo quiz={quizData} />;
@@ -24,7 +22,7 @@ const QuizInfoTab = ({ status, quizData }) => {
         </div>
       );
     case "published":
-      return <PublishedQuizInfo quiz={quizData} />;
+      return <PublishedQuizInfo quiz_id={quizData.id} />;
     case "done":
       return (
         <div>
