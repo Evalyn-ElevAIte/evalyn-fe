@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { login } from "../services/auth";
 import { getUser } from "../services/user";
+import LoadingScreen from "../components/LoadingScreen";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -14,7 +15,10 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const signInHandle = async () => {
+    setIsLoading(true);
     try {
       const signInResponse = await login(email, password);
       console.log("signInResponse: ", signInResponse);
@@ -23,6 +27,7 @@ const SignIn = () => {
         localStorage.setItem("evalyn_token", access_token);
         console.log("access_token: ", access_token);
         toast.success("Sign up successful! Redirecting to login...");
+
         setTimeout(() => {
           navigate("/home");
         }, 2500);
@@ -34,8 +39,11 @@ const SignIn = () => {
         //   localStorage.setItem("evalyn_username", username);
         // }
       }
+      setIsLoading(false);
     } catch (error) {
       console.log("error :", error);
+      toast.error("Failed to sign in. Please check your credentials.");
+      setIsLoading(false);
     }
   };
 
@@ -44,9 +52,14 @@ const SignIn = () => {
       className="min-h-[95vh] flex items-center justify-center bg-[#f3faff] bg-cover bg-center px-4"
       style={{ backgroundImage: `url(${HeroBg})` }}
     >
-      <ToastContainer position="top-right" autoClose={3000} />
+      {isLoading && <LoadingScreen />}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        toastClassName="bg-white shadow-lg rounded-xl"
+        bodyClassName="text-xl font-semibold"
+      />
       <div className="bg-white border border-yellow-300 rounded-[2rem] shadow-2xl w-full max-w-6xl h-[720px] flex flex-col md:flex-row overflow-hidden">
-        {/* Left: Welcome back */}
         <div className="w-full md:w-1/2 bg-white p-16 flex flex-col justify-center items-center border-r border-yellow-300">
           <FaArrowLeft className="text-blue-500 text-6xl mb-6" />
           <h3 className="text-3xl font-bold text-blue-500 mb-2">
@@ -60,7 +73,7 @@ const SignIn = () => {
           </p>
           <Link
             to="/signup"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-md shadow-md text-base"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-md shadow-md text-base cursor-pointer"
           >
             Sign up
           </Link>
@@ -75,7 +88,13 @@ const SignIn = () => {
             Insert your account below:
           </p>
 
-          <form className="flex flex-col gap-6">
+          <form
+            className="flex flex-col gap-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              signInHandle();
+            }}
+          >
             <div className="flex items-center gap-3 border border-yellow-400 rounded-full px-6 py-4 bg-white">
               <FaEnvelope className="text-yellow-500 text-xl" />
               <input
@@ -83,9 +102,7 @@ const SignIn = () => {
                 placeholder="Email"
                 className="outline-none flex-1 text-lg bg-transparent"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -96,16 +113,13 @@ const SignIn = () => {
                 placeholder="Password"
                 className="outline-none flex-1 text-lg bg-transparent"
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
             <button
-              type="button"
-              onClick={signInHandle}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-lg shadow-lg mt-6 text-xl"
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 cursor-pointer text-white font-semibold py-4 rounded-2xl shadow-lg mt-6 text-xl"
             >
               Sign in
             </button>

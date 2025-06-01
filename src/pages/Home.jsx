@@ -30,11 +30,14 @@ const Home = () => {
           setUserName(userResponse.data.name);
         }
 
-        if (rawResponse.status === 200) {
+        if (rawResponse.status === 200 && Array.isArray(rawResponse.data)) {
           setRawDummyActivities(rawResponse.data);
+        } else {
+          setRawDummyActivities([]);
         }
       } catch (error) {
         console.error("Fetch error:", error);
+        setRawDummyActivities([]);
       } finally {
         setIsLoading(false);
       }
@@ -43,67 +46,71 @@ const Home = () => {
     fetchAll();
   }, []);
 
-  const recentActivities = rawDummyActivities.slice(0, 3).map((item, index) => {
-    let iconComponent;
-    let statusText;
-    let statusBg;
-    let statusColor;
-    let titlePrefix;
+  const recentActivities = (
+    Array.isArray(rawDummyActivities) ? rawDummyActivities : []
+  )
+    .slice(0, 3)
+    .map((item, index) => {
+      let iconComponent;
+      let statusText;
+      let statusBg;
+      let statusColor;
+      let titlePrefix;
 
-    const isPublished = item.status === null && item.completed === false;
-    const isDone = item.status === null && item.completed === true;
-    const isUnfinished = item.status === "unfinished";
-    const isSubmitted = item.status === "submitted";
-    const isGraded = item.status === "graded";
+      const isPublished = item.status === null && item.completed === false;
+      const isDone = item.status === null && item.completed === true;
+      const isUnfinished = item.status === "unfinished";
+      const isSubmitted = item.status === "submited";
+      const isGraded = item.status === "graded";
 
-    if (isPublished) {
-      iconComponent = <FileText size={48} className="text-blue-600" />;
-      statusText = "Published";
-      statusBg = "bg-blue-100";
-      statusColor = "text-blue-700";
-      titlePrefix = "Quiz Created:";
-    } else if (isDone) {
-      iconComponent = <CheckCircle size={48} className="text-green-700" />;
-      statusText = "Completed";
-      statusBg = "bg-green-100";
-      statusColor = "text-green-700";
-      titlePrefix = "Quiz Finished:";
-    } else if (isUnfinished) {
-      iconComponent = <Clock size={48} className="text-orange-500" />;
-      statusText = "Pending";
-      statusBg = "bg-orange-100";
-      statusColor = "text-orange-700";
-      titlePrefix = "New Submission:";
-    } else if (isSubmitted) {
-      iconComponent = <Send size={48} className="text-purple-700" />;
-      statusText = "Submitted";
-      statusBg = "bg-purple-100";
-      statusColor = "text-purple-700";
-      titlePrefix = "Quiz Submitted:";
-    } else if (isGraded) {
-      iconComponent = <CheckCircle size={48} className="text-green-700" />;
-      statusText = "Graded";
-      statusBg = "bg-green-100";
-      statusColor = "text-green-700";
-      titlePrefix = "Quiz Graded:";
-    } else {
-      iconComponent = <FileText size={48} className="text-gray-400" />;
-      statusText = "Unknown";
-      statusBg = "bg-gray-100";
-      statusColor = "text-gray-700";
-      titlePrefix = "Activity:";
-    }
+      if (isPublished) {
+        iconComponent = <FileText size={48} className="text-blue-600" />;
+        statusText = "Published";
+        statusBg = "bg-blue-100";
+        statusColor = "text-blue-700";
+        titlePrefix = "Quiz Created:";
+      } else if (isDone) {
+        iconComponent = <CheckCircle size={48} className="text-green-700" />;
+        statusText = "Completed";
+        statusBg = "bg-green-100";
+        statusColor = "text-green-700";
+        titlePrefix = "Quiz Finished:";
+      } else if (isUnfinished) {
+        iconComponent = <Clock size={48} className="text-orange-500" />;
+        statusText = "Pending";
+        statusBg = "bg-orange-100";
+        statusColor = "text-orange-700";
+        titlePrefix = "New Submission:";
+      } else if (isSubmitted) {
+        iconComponent = <Send size={48} className="text-purple-700" />;
+        statusText = "Submitted";
+        statusBg = "bg-purple-100";
+        statusColor = "text-purple-700";
+        titlePrefix = "Quiz Submitted:";
+      } else if (isGraded) {
+        iconComponent = <CheckCircle size={48} className="text-green-700" />;
+        statusText = "Graded";
+        statusBg = "bg-green-100";
+        statusColor = "text-green-700";
+        titlePrefix = "Quiz Graded:";
+      } else {
+        iconComponent = <FileText size={48} className="text-gray-400" />;
+        statusText = "Unknown";
+        statusBg = "bg-gray-100";
+        statusColor = "text-gray-700";
+        titlePrefix = "Activity:";
+      }
 
-    return {
-      id: index,
-      icon: iconComponent,
-      title: `${titlePrefix} ${item.title}`,
-      description: item.description,
-      status: statusText,
-      statusBg: statusBg,
-      statusText: statusColor,
-    };
-  });
+      return {
+        id: index,
+        icon: iconComponent,
+        title: `${titlePrefix} ${item.title}`,
+        description: item.description,
+        status: statusText,
+        statusBg: statusBg,
+        statusText: statusColor,
+      };
+    });
 
   const joinHandle = async () => {
     const payload = { join_code: joinCode };
@@ -121,6 +128,10 @@ const Home = () => {
     navigate("/create");
   };
 
+  const viewQuizHandle = (quiz_id) => {
+    navigate(`/quiz-info/${quiz_id}`);
+  };
+
   if (isLoading) return <LoadingScreen />;
 
   return (
@@ -133,7 +144,12 @@ const Home = () => {
       <h2 className="text-lg font-medium mb-4">What would you like to do?</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        <div className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition">
+        <div
+          onClick={() => {
+            viewQuizHandle(quiz.id);
+          }}
+          className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition"
+        >
           <div className="text-3xl mb-4">
             <HiOutlineBookOpen size={86} className="text-blue" />
           </div>
@@ -171,7 +187,7 @@ const Home = () => {
             />
             <button
               onClick={joinHandle}
-              className="bg-blue hover:bg-blue-600 text-white px-6 py-3 rounded font-medium cursor-pointer flex gap-4 items-center"
+              className="bg-blue hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium cursor-pointer flex gap-4 items-center"
             >
               <CiLogin size={24} className="text-white" />
               Join
@@ -182,31 +198,35 @@ const Home = () => {
 
       <h2 className="text-lg font-medium mb-4">Your Recent Activity</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {recentActivities.map((activity) => (
-          <div
-            key={activity.id}
-            className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition"
-          >
-            <div className="flex justify-between mb-3">
-              <div className="items-center gap-3">
-                {activity.icon}
-                <div className="text-lg font-semibold text-gray-800 mt-6">
-                  {activity.title}
+      {recentActivities.length === 0 ? (
+        <p className="text-gray-500">No recent activities found.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {recentActivities.map((activity) => (
+            <div
+              key={activity.id}
+              className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg cursor-pointer transition"
+            >
+              <div className="flex justify-between mb-3">
+                <div className="items-center gap-3">
+                  {activity.icon}
+                  <div className="text-lg font-semibold text-gray-800 mt-6">
+                    {activity.title}
+                  </div>
                 </div>
+                <span
+                  className={`text-sm h-8 px-3 py-1 rounded-full font-medium ${activity.statusBg} ${activity.statusText} flex items-center`}
+                >
+                  {activity.status}
+                </span>
               </div>
-              <span
-                className={`text-sm h-8 px-3 py-1 rounded-full font-medium ${activity.statusBg} ${activity.statusText} flex items-center`}
-              >
-                {activity.status}
-              </span>
+              <div className="text-base text-gray-600">
+                {activity.description}
+              </div>
             </div>
-            <div className="text-base text-gray-600">
-              {activity.description}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

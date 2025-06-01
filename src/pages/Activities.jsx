@@ -1,8 +1,7 @@
 import React from "react";
 import { FileText, Clock, CheckCircle, Send, Edit } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getAllUserQuizzes } from "../services/user";
-import { useEffect } from "react";
 import LoadingScreen from "../components/LoadingScreen";
 
 const getDayLabel = (dateString) => {
@@ -25,6 +24,7 @@ const getDayLabel = (dateString) => {
     year: "numeric",
   });
 };
+
 const Activities = () => {
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +33,12 @@ const Activities = () => {
     setIsLoading(true);
     try {
       const activitiesResponse = await getAllUserQuizzes();
-      if (activitiesResponse.status === 200) {
+      console.log("activitiesResponse: ", activitiesResponse);
+
+      if (
+        activitiesResponse.status === 200 &&
+        Array.isArray(activitiesResponse.data)
+      ) {
         const transformed = activitiesResponse.data.map((item) => ({
           ...item,
           day: getDayLabel(item.created_at),
@@ -42,13 +47,15 @@ const Activities = () => {
             minute: "2-digit",
           }),
         }));
-
         setActivities(transformed);
+      } else {
+        setActivities([]);
       }
-      setIsLoading(true);
     } catch (error) {
-      console.log("error :", error);
-      setIsLoading(true);
+      console.log("error:", error);
+      setActivities([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,7 +72,7 @@ const Activities = () => {
   const getIconAndColor = (item) => {
     let iconComponent;
     let iconBgColorClass;
-    let iconColorClass = "text-white"; // default icon color
+    let iconColorClass = "text-white";
     let descriptionText;
     let messageText;
 
@@ -91,7 +98,7 @@ const Activities = () => {
       descriptionText = "New submission:";
       messageText = "New quiz is out—make sure to complete it on time!";
     } else if (isSubmitted) {
-      iconComponent = <Send size={48} />;
+      iconComponent = <Send size={42} className="relative top-0.5 right-0.7" />;
       iconBgColorClass = "bg-purple-500";
       descriptionText = "You have submitted quiz:";
       messageText = "Your score is coming soon, hang tight!";
@@ -117,12 +124,10 @@ const Activities = () => {
     };
   };
 
-  if (activities.length === 0) {
-    return <LoadingScreen />;
-  }
+  if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className=" pt-8">
+    <div className="pt-8">
       <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Recent Activity
@@ -172,50 +177,60 @@ const Activities = () => {
         </div>
       </div>
       <div className="px-4 py-6">
-        {Object.entries(grouped).map(([day, items]) => (
-          <div key={day} className="mb-8">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">{day}</h3>
-            <div className="flex flex-col gap-4">
-              {items.map((item, index) => {
-                const { icon, iconBgColor, iconColor, description, message } =
-                  getIconAndColor(item);
-                return (
-                  <div
-                    key={index}
-                    className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col md:flex-row justify-between items-start md:items-center"
-                  >
-                    <div className="flex items-start flex-grow">
-                      <div
-                        className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4 ${iconBgColor} ${iconColor}`}
-                      >
-                        {icon}
+        {Object.entries(grouped).length === 0 ? (
+          <p className="text-center text-gray-500">
+            There are no activities to show.
+          </p>
+        ) : (
+          Object.entries(grouped).map(([day, items]) => (
+            <div key={day} className="mb-8">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                {day}
+              </h3>
+              <div className="flex flex-col gap-4">
+                {items.map((item, index) => {
+                  const { icon, iconBgColor, iconColor, description, message } =
+                    getIconAndColor(item);
+                  return (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col md:flex-row justify-between items-start md:items-center"
+                    >
+                      <div className="flex items-start flex-grow">
+                        <div
+                          className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center mr-4 ${iconBgColor} ${iconColor}`}
+                        >
+                          {icon}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800 text-base leading-tight">
+                            {description}
+                            <span className="text-black font-bold">
+                              {item.title}
+                            </span>
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {message}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-gray-800 text-base leading-tight">
-                          {description}
-                          <span className="text-black font-bold">
-                            {item.title}
-                          </span>
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">{message}</p>
-                      </div>
-                    </div>
 
-                    <div className="flex flex-col md:flex-row items-end md:items-center gap-2 mt-4 md:mt-0 md:ml-4 flex-shrink-0 p-8">
-                      <button className="text-blue hover:text-blue-200 cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors duration-200">
-                        View Quiz
-                      </button>
-                      <span className="text-xs text-gray-400 md:ml-4 whitespace-nowrap">
-                        {item.time}
-                      </span>
+                      <div className="flex flex-col md:flex-row items-end md:items-center gap-2 mt-4 md:mt-0 md:ml-4 flex-shrink-0 p-8">
+                        <button className="text-blue hover:text-blue-200 cursor-pointer text-sm font-medium px-2 py-1 rounded transition-colors duration-200">
+                          View Quiz
+                        </button>
+                        <span className="text-xs text-gray-400 md:ml-4 whitespace-nowrap">
+                          {item.time}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>{" "}
+          ))
+        )}
+      </div>
     </div>
   );
 };

@@ -1,32 +1,25 @@
 import React from "react";
 import UnfinishedQuizInfo from "../quiz_info_content/UnfinishedQuizInfo";
+import SubmittedQuizInfo from "../quiz_info_content/SubmittedQuizInfo";
 
 const QuizInfoTab = ({ status, quizData }) => {
   if (!quizData) {
     return <div>No quiz data available.</div>;
   }
 
+  console.log("status: ", status);
+
   switch (status) {
     case "unfinished":
       return <UnfinishedQuizInfo quiz={quizData} />;
-    case "submitted":
-      return (
-        <div>
-          <h2 className="text-xl font-bold mb-2">{quizData.title}</h2>
-          <p className="text-gray-700 mb-4">{quizData.description}</p>
-          <p className="text-yellow-600">
-            You submitted this quiz. Await grading.
-          </p>
-        </div>
-      );
+    case "submited":
+      return <SubmittedQuizInfo quiz={quizData} />;
     case "graded":
       return (
         <div>
           <h2 className="text-xl font-bold mb-2">{quizData.title}</h2>
           <p className="text-gray-700 mb-4">{quizData.description}</p>
           <p className="text-green-600">Your quiz has been graded.</p>
-          {/* Optionally show score: */}
-          {/* <p className="font-semibold">Score: {quizData.score}</p> */}
         </div>
       );
     case "published":

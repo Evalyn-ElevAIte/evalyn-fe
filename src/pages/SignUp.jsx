@@ -17,7 +17,8 @@ const SignUp = () => {
 
   const signUpHandle = async () => {
     if (password != confirmPassword) {
-      alert("Please make sure your confirm password");
+      toast.error("Please make sure your confirm password");
+      // alert("Please make sure your confirm password");
     } else {
       try {
         const signUpResponse = await register(name, email, password);
@@ -110,7 +111,7 @@ const SignUp = () => {
             <button
               type="button"
               onClick={signUpHandle}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-lg shadow-lg mt-6 text-xl"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 rounded-2xl shadow-lg mt-6 text-xl"
             >
               Sign up
             </button>

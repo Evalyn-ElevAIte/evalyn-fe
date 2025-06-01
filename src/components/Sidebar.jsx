@@ -20,52 +20,50 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
 
   const sidebarWidth = isExpanded ? "w-86" : "w-32";
 
-  const dummyQuizzes = [
-    { title: "Programming Basics", dueDate: "Tuesday, 20 Mei 2025" },
-    { title: "Programming Logic", dueDate: "Tuesday, 20 Mei 2025" },
-    { title: "Programming Final", dueDate: "Tuesday, 20 Mei 2025" },
-  ];
-
-  const enrolledCourses = [
-    {
-      title: "Intro to React",
-      instructor: "John Doe",
-      dueDate: "Tuesday, 20 Mei 2025",
-    },
-    {
-      title: "Database Systems",
-      instructor: "Jane Smith",
-      dueDate: "Tuesday, 20 Mei 2025",
-    },
-  ];
-
   const handleLogout = () => {
     console.log("Logging out...");
     localStorage.clear();
     navigate("/signin");
   };
 
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "Asia/Jakarta",
+  };
+
   const fetchMyQuizzes = async () => {
     try {
-      const myQuizzesResponse = await getUserQuizzes();
-      // console.log("myQuizzesResponse: ", myQuizzesResponse);
-      if (myQuizzesResponse.status == 200) {
-        setEnrolledQuizzes(myQuizzesResponse.data);
+      const response = await getUserQuizzes();
+      if (response.status === 200) {
+        if (Array.isArray(response.data)) {
+          setEnrolledQuizzes(response.data);
+        } else if (response.data?.message === "User has no quizzes.") {
+          setEnrolledQuizzes([]);
+        }
       }
     } catch (error) {
       console.log("error :", error);
+      setEnrolledQuizzes([]);
     }
   };
 
   const fetchMyQuizzesCreator = async () => {
     try {
-      const myQuizzesCreatorResponse = await getUserQuizzesCreator();
-      // console.log("myQuizzesResponse: ", myQuizzesResponse);
-      if (myQuizzesCreatorResponse.status == 200) {
-        setMyQuizzes(myQuizzesCreatorResponse.data);
+      const response = await getUserQuizzesCreator();
+      console.log("myQuizzesResponse: ", response);
+      if (response.status === 200) {
+        if (Array.isArray(response.data)) {
+          setMyQuizzes(response.data);
+        } else if (response.data?.message === "User has no quizzes.") {
+          setMyQuizzes([]);
+        }
       }
     } catch (error) {
       console.log("error :", error);
+      setMyQuizzes([]);
     }
   };
 
@@ -160,7 +158,12 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
                       {quiz.title}
                     </div>
                     <div className="text-xs text-gray-500">
-                      due to: {quiz.dueDate}
+                      due to:{" "}
+                      {quiz.end_time &&
+                        new Date(quiz.end_time).toLocaleDateString(
+                          "en-US",
+                          options
+                        )}
                     </div>
                   </div>
                 </div>
