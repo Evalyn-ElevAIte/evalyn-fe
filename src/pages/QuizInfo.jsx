@@ -5,27 +5,44 @@ import PeopleTab from "./tabs/PeopleTab";
 import GradesTab from "./tabs/GradesTab";
 import { getQuizById } from "../services/quiz";
 import LoadingScreen from "../components/LoadingScreen";
+import { getAllStudentsAssessments } from "../services/assessments";
 
 const QuizInfo = () => {
   const { quiz_id } = useParams();
   const [quizData, setQuizData] = useState(null);
+  const [people, setPeople] = useState([]);
+
   const [activeTab, setActiveTab] = useState("info");
   const [availableTabs, setAvailableTabs] = useState([]);
 
-  useEffect(() => {
-    const fetchQuiz = async () => {
-      try {
-        const response = await getQuizById(quiz_id);
-        if (response.status === 200) {
-          setQuizData(response.data);
-          console.log("quizData: ", response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch quiz:", error);
+  const fetchPeople = async () => {
+    try {
+      const peopleResponse = await getAllStudentsAssessments(quiz_id);
+      if (peopleResponse.status === 200) {
+        setPeople(peopleResponse.data.assessments);
+        console.log("peopleResponse.data: ", peopleResponse.data.assessments);
       }
-    };
+    } catch (error) {
+      console.error("Failed to load people list:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchQuiz = async () => {
+    try {
+      const response = await getQuizById(quiz_id);
+      if (response.status === 200) {
+        setQuizData(response.data);
+        console.log("quizData: ", response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch quiz:", error);
+    }
+  };
+  useEffect(() => {
     fetchQuiz();
+    fetchPeople();
   }, [quiz_id]);
 
   useEffect(() => {
@@ -36,7 +53,7 @@ const QuizInfo = () => {
       setAvailableTabs(["info", "people", "grades"]);
     } else if (quizData.status === "unfinished") {
       setAvailableTabs(["info", "people"]);
-    } else if (quizData.status === "submitted") {
+    } else if (quizData.status === "submited") {
       setAvailableTabs(["info", "people"]);
     } else if (quizData.status === "graded") {
       setAvailableTabs(["info", "people", "grades"]);
@@ -57,7 +74,9 @@ const QuizInfo = () => {
       case "info":
         return <QuizInfoTab quizData={quizData} status={status} />;
       case "people":
-        return <PeopleTab quizId={quizData.id} status={status} />;
+        return (
+          <PeopleTab quizId={quizData.id} status={status} people={people} />
+        );
       case "grades":
         return <GradesTab quizId={quizData.id} />;
       default:
@@ -71,7 +90,7 @@ const QuizInfo = () => {
     grades: "Grades",
   };
 
-  if (!quizData) {
+  if (!quizData || !people) {
     return <LoadingScreen />;
   }
 

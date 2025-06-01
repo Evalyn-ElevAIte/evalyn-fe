@@ -14,6 +14,7 @@ const QuizStartPage = () => {
   const [quizData, setQuizData] = useState(null);
   const [answers, setAnswers] = useState({});
   const [remainingTime, setRemainingTime] = useState(0);
+  const token = localStorage.getItem("evalyn_token");
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -68,14 +69,19 @@ const QuizStartPage = () => {
     };
 
     console.log("payload: ", payload);
+    console.log("token: ", token);
+
+    console.log("quizData.id: ", quizData.id);
     try {
-      const res = await Promise.all([
+      const [submitRes, analyzeRes] = await Promise.all([
         submitAllAnswers(payload),
-        analyzeQuiz(quizData.id, payload),
+        analyzeQuiz(quizData.id, payload), // ← make sure to pass payload
       ]);
-      console.log("res: ", res);
-      if (res.status === 200) {
-        navigate("/home");
+
+      if (submitRes.status === 200 && analyzeRes.status === 200) {
+        navigate("/success-submit", { state: { title: quizData.title } });
+      } else {
+        console.error("One of the requests failed:", submitRes, analyzeRes);
       }
     } catch (error) {
       console.error("Submit error:", error);

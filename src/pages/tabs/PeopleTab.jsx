@@ -30,27 +30,27 @@ const getStatusLabel = (status) => {
       return <span className="text-xs text-gray-400">Unknown</span>;
   }
 };
-const PeopleTab = ({ quizId, status }) => {
-  const [people, setPeople] = useState([]);
-  const [loading, setLoading] = useState(true);
+const PeopleTab = ({ quizId, status, people }) => {
+  // const [people, setPeople] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchPeople = async () => {
-      try {
-        const response = await getAllStudentsAssessments(quizId);
-        if (response.status === 200) {
-          setPeople(response.data.assessments);
-          console.log("response.data: ", response.data.assessments);
-        }
-      } catch (error) {
-        console.error("Failed to load people list:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPeople = async () => {
+  //     try {
+  //       const response = await getAllStudentsAssessments(quizId);
+  //       if (response.status === 200) {
+  //         setPeople(response.data.assessments);
+  //         console.log("response.data: ", response.data.assessments);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to load people list:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchPeople();
-  }, [quizId]);
+  //   fetchPeople();
+  // }, [quizId]);
 
   if (loading) return <LoadingScreen />;
 
