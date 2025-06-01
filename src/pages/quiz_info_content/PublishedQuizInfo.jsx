@@ -10,10 +10,13 @@ import {
 } from "recharts";
 import { getQuizStatistics } from "../../services/assessments";
 
-const PublishedQuizInfo = ({ quiz_id }) => {
+const PublishedQuizInfo = ({ quiz, quiz_id }) => {
   const [overview, setOverview] = useState(null);
   const [activeTab, setActiveTab] = useState("top");
-
+  const handleCopy = () => {
+    navigator.clipboard.writeText(quiz.join_code);
+    alert("Quiz code copied!");
+  };
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -21,6 +24,7 @@ const PublishedQuizInfo = ({ quiz_id }) => {
         console.log("statisticResponse: ", response);
         if (response.status === 200) {
           setOverview(response.data);
+          console.log("response.data: ", response.data);
         }
       } catch (error) {
         console.error("Failed to fetch quiz statistics:", error);
@@ -83,7 +87,21 @@ const PublishedQuizInfo = ({ quiz_id }) => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-2">Quiz Overview</h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold mb-2">Quiz Overview</h1>
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-xl font-semibold text-blue-600">
+            {quiz.join_code}
+          </span>
+          <button
+            onClick={handleCopy}
+            className="bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300 cursor-pointer"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+
       <p className="text-gray-600 mb-6">
         Quiz ID: {quiz_id} - Comprehensive performance analytics
       </p>
@@ -174,7 +192,9 @@ const PublishedQuizInfo = ({ quiz_id }) => {
           <button
             onClick={() => setActiveTab("top")}
             className={`px-4 py-2 text-sm rounded ${
-              activeTab === "top" ? "bg-blue-600 text-white" : "bg-gray-200"
+              activeTab === "top"
+                ? "bg-blue text-white"
+                : "bg-gray-200 hover:bg-blue hover:text-white cursor-pointer"
             }`}
           >
             Top Performers
@@ -182,7 +202,9 @@ const PublishedQuizInfo = ({ quiz_id }) => {
           <button
             onClick={() => setActiveTab("bottom")}
             className={`px-4 py-2 text-sm rounded ${
-              activeTab === "bottom" ? "bg-blue-600 text-white" : "bg-gray-200"
+              activeTab === "bottom"
+                ? "bg-blue  text-white"
+                : "bg-gray-200 hover:bg-blue hover:text-white cursor-pointer"
             }`}
           >
             Bottom Performers
@@ -196,11 +218,11 @@ const PublishedQuizInfo = ({ quiz_id }) => {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-gray-700 bg-gray-50">
                 <tr>
-                  <th>#</th>
-                  <th>Student</th>
-                  <th>Score</th>
-                  <th>Max</th>
-                  <th>%</th>
+                  <th className="p-3">#</th>
+                  <th className="p-3">Student</th>
+                  <th className="p-3">Score</th>
+                  <th className="p-3">Max</th>
+                  <th className="p-3">%</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,11 +231,11 @@ const PublishedQuizInfo = ({ quiz_id }) => {
                   : overview.bottom_performers
                 ).map((s, i) => (
                   <tr key={i} className="border-b">
-                    <td>{i + 1}</td>
-                    <td>{s.student_name}</td>
-                    <td>{s.score}</td>
-                    <td>{s.max_score}</td>
-                    <td>{s.percentage.toFixed(2)}%</td>
+                    <td className="p-3">{i + 1}</td>
+                    <td className="p-3">{s.student_name}</td>
+                    <td className="p-3">{s.score}</td>
+                    <td className="p-3">{s.max_score}</td>
+                    <td className="p-3">{s.percentage.toFixed(2)}%</td>
                   </tr>
                 ))}
               </tbody>

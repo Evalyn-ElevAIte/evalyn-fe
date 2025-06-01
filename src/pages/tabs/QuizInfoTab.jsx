@@ -22,17 +22,11 @@ const QuizInfoTab = ({ status, quizData }) => {
         </div>
       );
     case "published":
-      return <PublishedQuizInfo quiz_id={quizData.id} />;
+      return <PublishedQuizInfo quiz={quizData} quiz_id={quizData.id} />;
+
     case "done":
-      return (
-        <div>
-          <h2 className="text-xl font-bold mb-2">{quizData.title}</h2>
-          <p className="text-gray-700 mb-4">{quizData.description}</p>
-          <p className="text-green-700">
-            All students have completed this quiz.
-          </p>
-        </div>
-      );
+      return <PublishedQuizInfo quiz={quizData} quiz_id={quizData.id} />;
+
     default:
       return (
         <div>
