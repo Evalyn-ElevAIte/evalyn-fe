@@ -5,48 +5,6 @@ import { getAllUserQuizzes } from "../services/user";
 import { useEffect } from "react";
 import LoadingScreen from "../components/LoadingScreen";
 
-const dummyActivities = [
-  {
-    day: "Today",
-    type: "My Quizzes",
-    status: "created",
-    quizTitle: "Introduction to Philosophy",
-    message: "Quiz created! Keep an eye on it regularly.",
-    time: "2 hours ago",
-  },
-  {
-    day: "Today",
-    type: "Enrolled",
-    status: "unfinished",
-    quizTitle: "Mathematics Basics",
-    message: "New quiz is out—make sure to complete it on time!",
-    time: "6 hours ago",
-  },
-  {
-    day: "Yesterday",
-    type: "Enrolled",
-    status: "submitted",
-    quizTitle: "Biology 101",
-    message: "Your score is coming soon, hang tight!",
-    time: "1 day ago",
-  },
-  {
-    day: "Yesterday",
-    type: "Enrolled",
-    status: "graded",
-    quizTitle: "Chemistry Fundamentals",
-    message: "Sarah Johnson completed the quiz",
-    time: "1 day ago",
-  },
-  {
-    day: "Yesterday",
-    type: "My Quizzes",
-    status: "done",
-    quizTitle: "Chemistry Fundamentals",
-    message: "All the participant already finish the quiz",
-    time: "1 day ago",
-  },
-];
 const getDayLabel = (dateString) => {
   const date = new Date(dateString);
   const today = new Date();
@@ -69,8 +27,10 @@ const getDayLabel = (dateString) => {
 };
 const Activities = () => {
   const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchActivities = async () => {
+    setIsLoading(true);
     try {
       const activitiesResponse = await getAllUserQuizzes();
       if (activitiesResponse.status === 200) {
@@ -85,8 +45,10 @@ const Activities = () => {
 
         setActivities(transformed);
       }
+      setIsLoading(true);
     } catch (error) {
       console.log("error :", error);
+      setIsLoading(true);
     }
   };
 
