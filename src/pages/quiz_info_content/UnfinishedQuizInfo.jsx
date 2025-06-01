@@ -69,13 +69,13 @@ const UnfinishedQuizInfo = ({ quiz }) => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={cancelStart}
-                className="px-4 py-2 rounded border text-gray-700 hover:bg-gray-100"
+                className="px-4 py-2 rounded border cursor-pointer text-gray-700 hover:bg-gray-100"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmStart}
-                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                className="px-4 py-2 rounded cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
               >
                 Yes, Start
               </button>

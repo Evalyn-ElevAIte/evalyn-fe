@@ -1,4 +1,3 @@
-// src/pages/QuizStartPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getQuizById } from "../services/quiz";
@@ -7,27 +6,56 @@ import {
   submitAllAnswers,
 } from "../services/student_answer";
 import { analyzeQuiz } from "../services/ai";
+import LoadingScreen from "../components/LoadingScreen";
 
 const QuizStartPage = () => {
   const { quiz_id } = useParams();
   const navigate = useNavigate();
   const [quizData, setQuizData] = useState(null);
   const [answers, setAnswers] = useState({});
-  const [remainingTime, setRemainingTime] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [remainingTime, setRemainingTime] = useState(() => {
+    const savedEndTime = localStorage.getItem(`quiz_end_time_${quiz_id}`);
+    if (savedEndTime) {
+      const diff = Math.floor((new Date(savedEndTime) - new Date()) / 1000);
+      return diff > 0 ? diff : 0;
+    }
+    return 0;
+  });
+
   const token = localStorage.getItem("evalyn_token");
 
   useEffect(() => {
     const fetchQuiz = async () => {
+      setIsLoading(true);
       try {
         const response = await getQuizWithQuestions(quiz_id);
         if (response.status === 200) {
           setQuizData(response.data);
-          setRemainingTime(response.data.duration * 60);
-          console.log("response.data ", response.data);
-          console.log("response.data.duration: ", response.data.duration);
+          const existingEndTime = localStorage.getItem(
+            `quiz_end_time_${quiz_id}`
+          );
+          if (!existingEndTime) {
+            const endTime = new Date(
+              new Date().getTime() + response.data.duration * 60000
+            );
+            localStorage.setItem(
+              `quiz_end_time_${quiz_id}`,
+              endTime.toISOString()
+            );
+            setRemainingTime(response.data.duration * 60);
+          } else {
+            const diff = Math.floor(
+              (new Date(existingEndTime) - new Date()) / 1000
+            );
+            setRemainingTime(diff > 0 ? diff : 0);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch quiz:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchQuiz();
@@ -56,6 +84,7 @@ const QuizStartPage = () => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     const payload = {
       quiz_id: quizData.id,
       title: quizData.title,
@@ -68,14 +97,10 @@ const QuizStartPage = () => {
       })),
     };
 
-    console.log("payload: ", payload);
-    console.log("token: ", token);
-
-    console.log("quizData.id: ", quizData.id);
     try {
       const [submitRes, analyzeRes] = await Promise.all([
         submitAllAnswers(payload),
-        analyzeQuiz(quizData.id, payload), // ← make sure to pass payload
+        analyzeQuiz(quizData.id, payload),
       ]);
 
       if (submitRes.status === 200 && analyzeRes.status === 200) {
@@ -85,6 +110,8 @@ const QuizStartPage = () => {
       }
     } catch (error) {
       console.error("Submit error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,7 +123,7 @@ const QuizStartPage = () => {
     return `${m}:${s}`;
   };
 
-  if (!quizData) return <div>Loading...</div>;
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <div className="max-w-4xl mx-auto p-4 mt-12">
@@ -108,21 +135,30 @@ const QuizStartPage = () => {
       </div>
       <p className="text-gray-700 mb-6">{quizData.description}</p>
 
-      {quizData.questions.map((question) => (
-        <div key={question.id} className="mb-6">
-          <h3 className="font-semibold mb-2">{question.text}</h3>
+      {quizData.questions.map((question, index) => (
+        <div
+          key={question.id}
+          className="bg-blue-50 border border-orange-200 rounded-2xl p-6 mb-6"
+        >
+          <p className="text-sm text-gray-500 mb-1 font-medium">
+            Number {index + 1}
+          </p>
+          <h3 className="font-semibold mb-3 text-lg">{question.text}</h3>
+
           {question.type === "text" && (
             <textarea
-              className="w-full border p-2 rounded"
+              className="w-full border p-3 rounded text-sm"
               rows={4}
+              placeholder="Type your answer here..."
               value={answers[question.id] || ""}
               onChange={(e) => handleChange(question.id, e.target.value)}
             />
           )}
+
           {question.type === "single_choice" && (
             <div className="space-y-2">
               {question.options.map((opt, idx) => (
-                <label key={idx} className="block">
+                <label key={idx} className="block text-sm">
                   <input
                     type="radio"
                     name={`single_${question.id}`}
@@ -136,10 +172,11 @@ const QuizStartPage = () => {
               ))}
             </div>
           )}
+
           {question.type === "multi_choice" && (
             <div className="space-y-2">
               {question.options.map((opt, idx) => (
-                <label key={idx} className="block">
+                <label key={idx} className="block text-sm">
                   <input
                     type="checkbox"
                     value={opt}
@@ -167,7 +204,7 @@ const QuizStartPage = () => {
 
       <button
         onClick={handleSubmit}
-        className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+        className="bg-blue cursor-pointer text-white px-6 py-3 rounded-lg hover:bg-blue-700"
       >
         Submit Quiz
       </button>

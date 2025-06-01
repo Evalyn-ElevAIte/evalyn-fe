@@ -24,7 +24,7 @@ const SuccessSubmit = () => {
           answers. You can check back later for your results.
         </p>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          className="bg-blue-500 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-blue-600"
           onClick={() => navigate("/home")}
         >
           Back to Home

@@ -1,46 +1,7 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUserQuizzes, getUserQuizzesCreator } from "../services/user";
 import LoadingScreen from "../components/LoadingScreen";
-
-const dummyQuizzes = [
-  {
-    title: "Advanced Mathematics Quiz",
-    created: "Jan 14, 2024",
-    submissions: 32,
-    status: "Published",
-    type: "mine",
-  },
-  {
-    title: "Physics Midterm Test",
-    created: "Jan 10, 2024",
-    submissions: 41,
-    status: "Done",
-    type: "mine",
-  },
-  {
-    title: "Introduction to Biology",
-    created: "Jan 15, 2024",
-    submissions: 45,
-    status: "Unfinished",
-    type: "enrolled",
-  },
-  {
-    title: "Advanced Mathematics Quiz",
-    created: "Jan 14, 2024",
-    submissions: 32,
-    status: "Submitted",
-    type: "enrolled",
-  },
-  {
-    title: "World History Assessment",
-    created: "Jan 13, 2024",
-    submissions: 28,
-    status: "Graded",
-    type: "enrolled",
-  },
-];
 
 const STATUS_STYLE = {
   Published: "bg-blue-100 text-blue-600",
@@ -53,6 +14,8 @@ const STATUS_STYLE = {
 const MyQuizzes = () => {
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const [currentPageMyQuizzes, setCurrentPageMyQuizzes] = useState(1);
   const [currentPageEnrolled, setCurrentPageEnrolled] = useState(1);
   const quizzesPerPage = 3;
@@ -64,18 +27,17 @@ const MyQuizzes = () => {
     navigate(`/quiz-info/${quiz_id}`);
   };
 
-  // const myQuizzes = dummyQuizzes.filter((quiz) => quiz.type === "mine");
-  // const enrolledQuizzes = dummyQuizzes.filter(
-  //   (quiz) => quiz.type === "enrolled"
-  // );
-
   const fetchMyQuizzes = async () => {
     try {
       const myQuizzesResponse = await getUserQuizzes();
-      // console.log("myQuizzesResponse: ", myQuizzesResponse);
-      if (myQuizzesResponse.status == 200) {
-        setEnrolledQuizzes(myQuizzesResponse.data);
-        console.log("myQuizzesResponse.data: ", myQuizzesResponse.data);
+      if (myQuizzesResponse.status === 200) {
+        const data = myQuizzesResponse.data;
+        if (Array.isArray(data)) {
+          setEnrolledQuizzes(data);
+        } else {
+          setEnrolledQuizzes([]);
+          console.warn("No my quizzes found:", data.detail);
+        }
       }
     } catch (error) {
       console.log("error :", error);
@@ -85,23 +47,47 @@ const MyQuizzes = () => {
   const fetchMyQuizzesCreator = async () => {
     try {
       const myQuizzesCreatorResponse = await getUserQuizzesCreator();
-      // console.log("myQuizzesResponse: ", myQuizzesResponse);
-      if (myQuizzesCreatorResponse.status == 200) {
-        setMyQuizzes(myQuizzesCreatorResponse.data);
-        console.log(
-          "myQuizzesCreatorResponse.data: ",
-          myQuizzesCreatorResponse.data
-        );
+      if (myQuizzesCreatorResponse.status === 200) {
+        const data = myQuizzesCreatorResponse.data;
+        if (Array.isArray(data)) {
+          setMyQuizzes(data);
+        } else {
+          setMyQuizzes([]);
+          console.warn("No enrolled quizzes found:", data.detail);
+        }
       }
     } catch (error) {
       console.log("error :", error);
     }
   };
+  useEffect(() => {
+    const loadQuizzes = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([fetchMyQuizzes(), fetchMyQuizzesCreator()]);
+      } catch (error) {
+        console.error("Failed to fetch quizzes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadQuizzes();
+  }, []);
+  const totalPagesMyQuizzes = Math.ceil(myQuizzes.length / quizzesPerPage);
+  const totalPagesEnrolled = Math.ceil(enrolledQuizzes.length / quizzesPerPage);
 
   useEffect(() => {
-    fetchMyQuizzes();
-    fetchMyQuizzesCreator();
-  }, []);
+    if (currentPageMyQuizzes > totalPagesMyQuizzes && totalPagesMyQuizzes > 0) {
+      setCurrentPageMyQuizzes(1);
+    }
+  }, [myQuizzes]);
+
+  useEffect(() => {
+    if (currentPageEnrolled > totalPagesEnrolled && totalPagesEnrolled > 0) {
+      setCurrentPageEnrolled(1);
+    }
+  }, [enrolledQuizzes]);
 
   const paginate = (quizzes, currentPage) => {
     const indexOfLast = currentPage * quizzesPerPage;
@@ -109,16 +95,11 @@ const MyQuizzes = () => {
     return quizzes.slice(indexOfFirst, indexOfLast);
   };
 
-  const totalPagesMyQuizzes = Math.ceil(myQuizzes.length / quizzesPerPage);
-  const totalPagesEnrolled = Math.ceil(enrolledQuizzes.length / quizzesPerPage);
-
   const createQuizHandle = () => {
     navigate(`/create`);
   };
 
-  if (myQuizzes.length === 0 && enrolledQuizzes.length === 0) {
-    return <LoadingScreen />;
-  }
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <div className="">
@@ -130,6 +111,7 @@ const MyQuizzes = () => {
           Manage your quizzes and view student submissions.
         </p>
       </div>
+
       <div className="flex justify-between items-center">
         <input
           type="text"
@@ -146,151 +128,165 @@ const MyQuizzes = () => {
 
       <h2 className="text-base font-semibold text-gray-700 mb-2">My Quizzes</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        {paginate(myQuizzes, currentPageMyQuizzes).map((quiz, index) => (
-          <div
-            key={index}
-            className="border border-gray-200 rounded-3xl p-8 bg-white shadow-sm"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-base font-semibold text-gray-800">
-                {quiz.title}
-              </h3>
-              {quiz.status && (
-                <span
-                  className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    STATUS_STYLE[quiz.status]
-                  }`}
-                >
-                  {quiz.status}
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-500 mb-1">
-              Created: {quiz.created}
-            </p>
-            <p className="text-sm text-gray-500 mb-3">
-              {quiz.submissions} submissions
-            </p>
-            <button
-              onClick={() => {
-                viewQuizHandle(quiz.id);
-              }}
-              className="bg-blue text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all cursor-pointer"
+        {paginate(myQuizzes, currentPageMyQuizzes).length > 0 ? (
+          paginate(myQuizzes, currentPageMyQuizzes).map((quiz, index) => (
+            <div
+              key={index}
+              className="border border-gray-200 rounded-3xl p-8 bg-white shadow-sm"
             >
-              View Quiz
-            </button>
-          </div>
-        ))}
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-base font-semibold text-gray-800">
+                  {quiz.title}
+                </h3>
+                {quiz.status && (
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      STATUS_STYLE[quiz.status]
+                    }`}
+                  >
+                    {quiz.status}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-500 mb-1">
+                Created: {quiz.created}
+              </p>
+              <p className="text-sm text-gray-500 mb-3">
+                {quiz.submissions} submissions
+              </p>
+              <button
+                onClick={() => viewQuizHandle(quiz.id)}
+                className="bg-blue text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all cursor-pointer"
+              >
+                View Quiz
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 col-span-full text-center">
+            No quizzes found.
+          </p>
+        )}
       </div>
-      <div className="flex justify-center items-center gap-2 mb-8">
-        <button
-          onClick={() =>
-            setCurrentPageMyQuizzes((prev) => Math.max(prev - 1, 1))
-          }
-          disabled={currentPageMyQuizzes === 1}
-          className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
-        >
-          &lt;
-        </button>
-        {[...Array(totalPagesMyQuizzes)].map((_, i) => (
+
+      {totalPagesMyQuizzes > 1 && (
+        <div className="flex justify-center items-center gap-2 mb-8">
           <button
-            key={i}
-            onClick={() => setCurrentPageMyQuizzes(i + 1)}
-            className={`px-3 py-1 border rounded ${
-              currentPageMyQuizzes === i + 1
-                ? "bg-blue text-white border-blue"
-                : "border-gray-300 text-gray-700 hover:bg-gray-300 cursor-pointer "
-            }`}
+            onClick={() =>
+              setCurrentPageMyQuizzes((prev) => Math.max(prev - 1, 1))
+            }
+            disabled={currentPageMyQuizzes === 1}
+            className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
           >
-            {i + 1}
+            &lt;
           </button>
-        ))}
-        <button
-          onClick={() =>
-            setCurrentPageMyQuizzes((prev) =>
-              Math.min(prev + 1, totalPagesMyQuizzes)
-            )
-          }
-          disabled={currentPageMyQuizzes === totalPagesMyQuizzes}
-          className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
-        >
-          &gt;
-        </button>
-      </div>
+          {[...Array(totalPagesMyQuizzes)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPageMyQuizzes(i + 1)}
+              className={`px-3 py-1 border rounded ${
+                currentPageMyQuizzes === i + 1
+                  ? "bg-blue text-white border-blue"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-300 cursor-pointer"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() =>
+              setCurrentPageMyQuizzes((prev) =>
+                Math.min(prev + 1, totalPagesMyQuizzes)
+              )
+            }
+            disabled={currentPageMyQuizzes === totalPagesMyQuizzes}
+            className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
+          >
+            &gt;
+          </button>
+        </div>
+      )}
 
       <h2 className="text-base font-semibold text-gray-700 mb-2">Enrolled</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        {paginate(enrolledQuizzes, currentPageEnrolled).map((quiz, index) => (
-          <div
-            key={index}
-            className="border border-gray-200 rounded-3xl p-8 bg-white shadow-sm"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-base font-semibold text-gray-800">
-                {quiz.title}
-              </h3>
-              {quiz.status && (
-                <span
-                  className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    STATUS_STYLE[quiz.status]
-                  }`}
-                >
-                  {quiz.status}
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-500 mb-1">
-              Created: {quiz.created}
-            </p>
-            <p className="text-sm text-gray-500 mb-3">
-              {quiz.submissions} submissions
-            </p>
-            <button
-              onClick={() => {
-                viewQuizHandle(quiz.id);
-              }}
-              className="bg-blue text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all cursor-pointer"
+        {paginate(enrolledQuizzes, currentPageEnrolled).length > 0 ? (
+          paginate(enrolledQuizzes, currentPageEnrolled).map((quiz, index) => (
+            <div
+              key={index}
+              className="border border-gray-200 rounded-3xl p-8 bg-white shadow-sm"
             >
-              View Quiz
-            </button>
-          </div>
-        ))}
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-base font-semibold text-gray-800">
+                  {quiz.title}
+                </h3>
+                {quiz.status && (
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      STATUS_STYLE[quiz.status]
+                    }`}
+                  >
+                    {quiz.status}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-500 mb-1">
+                Created: {quiz.created}
+              </p>
+              <p className="text-sm text-gray-500 mb-3">
+                {quiz.submissions} submissions
+              </p>
+              <button
+                onClick={() => viewQuizHandle(quiz.id)}
+                className="bg-blue text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-all cursor-pointer"
+              >
+                View Quiz
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 col-span-full text-center">
+            No enrolled quizzes found.
+          </p>
+        )}
       </div>
-      <div className="flex justify-center items-center gap-2">
-        <button
-          onClick={() =>
-            setCurrentPageEnrolled((prev) => Math.max(prev - 1, 1))
-          }
-          disabled={currentPageEnrolled === 1}
-          className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
-        >
-          &lt;
-        </button>
-        {[...Array(totalPagesEnrolled)].map((_, i) => (
+
+      {totalPagesEnrolled > 1 && (
+        <div className="flex justify-center items-center gap-2">
           <button
-            key={i}
-            onClick={() => setCurrentPageEnrolled(i + 1)}
-            className={`px-3 py-1 border rounded  ${
-              currentPageEnrolled === i + 1
-                ? "bg-blue text-white border-blue"
-                : "border-gray-300 text-gray-700 hover:bg-gray-300 cursor-pointer"
-            }`}
+            onClick={() =>
+              setCurrentPageEnrolled((prev) => Math.max(prev - 1, 1))
+            }
+            disabled={currentPageEnrolled === 1}
+            className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
           >
-            {i + 1}
+            &lt;
           </button>
-        ))}
-        <button
-          onClick={() =>
-            setCurrentPageEnrolled((prev) =>
-              Math.min(prev + 1, totalPagesEnrolled)
-            )
-          }
-          disabled={currentPageEnrolled === totalPagesEnrolled}
-          className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
-        >
-          &gt;
-        </button>
-      </div>
+          {[...Array(totalPagesEnrolled)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPageEnrolled(i + 1)}
+              className={`px-3 py-1 border rounded ${
+                currentPageEnrolled === i + 1
+                  ? "bg-blue text-white border-blue"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-300 cursor-pointer"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() =>
+              setCurrentPageEnrolled((prev) =>
+                Math.min(prev + 1, totalPagesEnrolled)
+              )
+            }
+            disabled={currentPageEnrolled === totalPagesEnrolled}
+            className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50 hover:bg-gray-300 cursor-pointer"
+          >
+            &gt;
+          </button>
+        </div>
+      )}
     </div>
   );
 };
