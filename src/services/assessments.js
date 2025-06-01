@@ -10,3 +10,9 @@ export const getAllStudentsAssessments = (quiz_id) => {
 export const getAssessmentById = (assesment_id) => {
   return api.get(`/assesment/${assesment_id}`);
 };
+
+export const updateAssessmentGrading = (assesment_id, payload) => {
+  return api.patch(`/assesment/${assesment_id}/grade`, payload, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

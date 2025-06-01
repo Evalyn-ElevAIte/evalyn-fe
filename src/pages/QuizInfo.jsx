@@ -52,13 +52,13 @@ const QuizInfo = () => {
 
     if (!quizData.status && quizData.completed !== null) {
       // Teacher
-      setAvailableTabs(["info", "people", "grades"]);
+      setAvailableTabs(["info", "people"]); //grades is saved first
     } else if (quizData.status === "unfinished") {
       setAvailableTabs(["info", "people"]);
     } else if (quizData.status === "submited") {
       setAvailableTabs(["info", "people"]);
     } else if (quizData.status === "graded") {
-      setAvailableTabs(["info", "people", "grades"]);
+      setAvailableTabs(["info", "people"]); //grades is saved first
     } else {
       setAvailableTabs(["info"]);
     }
@@ -79,7 +79,12 @@ const QuizInfo = () => {
         return <QuizInfoTab quizData={quizData} status={status} />;
       case "people":
         return (
-          <PeopleTab quizId={quizData.id} status={status} people={people} />
+          <PeopleTab
+            quizId={quizData.id}
+            status={status}
+            people={people}
+            quizName={quizData.title}
+          />
         );
       case "grades":
         return <GradesTab quizId={quizData.id} />;

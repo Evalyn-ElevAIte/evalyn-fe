@@ -31,7 +31,7 @@ const getStatusLabel = (status) => {
   }
 };
 
-const PeopleTab = ({ quizId, status, people }) => {
+const PeopleTab = ({ quizId, status, people, quizName }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -44,6 +44,7 @@ const PeopleTab = ({ quizId, status, people }) => {
           state: {
             result: res.data,
             studentName: person.student_name,
+            quizName: quizName,
           },
         });
       }

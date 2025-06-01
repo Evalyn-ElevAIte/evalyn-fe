@@ -1,14 +1,58 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import LoadingScreen from "../components/LoadingScreen";
+import { updateAssessmentGrading } from "../services/assessments";
 
 const AssessmentResultPage = () => {
+  const navigate = useNavigate();
+
   const location = useLocation();
   const result = location.state?.result;
   const studentName = location.state?.studentName;
 
+  const [questionScores, setQuestionScores] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (result) {
+      setQuestionScores(
+        result.question_assessments.map((q) => ({
+          question_id: q.question_id,
+          new_score: q.score,
+        }))
+      );
+    }
+  }, [result]);
+
+  const handleScoreChange = (question_id, value) => {
+    setQuestionScores((prev) =>
+      prev.map((item) =>
+        item.question_id === question_id
+          ? { ...item, new_score: parseInt(value) || 0 }
+          : item
+      )
+    );
+  };
+
+  const handleSubmit = async () => {
+    const payload = { question_scores: questionScores };
+
+    try {
+      setIsSubmitting(true);
+
+      const sendResponse = await updateAssessmentGrading(result.id, payload);
+      console.log("sendResponse: ", sendResponse);
+      if (sendResponse.status == 200) {
+        navigate(-1);
+      }
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!result) return <LoadingScreen />;
-  console.log("result: ", result);
 
   const getScoreColor = (score) => {
     if (score >= 80) return "bg-green-500";
@@ -21,7 +65,7 @@ const AssessmentResultPage = () => {
   );
 
   return (
-    <div className="max-w-[1450px] mx-auto pt-16 px-4">
+    <div className="max-w-4xl mx-auto py-10 px-4">
       <h2 className="text-2xl font-bold mb-6">AI Analysis Result</h2>
 
       {/* Summary Box */}
@@ -49,17 +93,18 @@ const AssessmentResultPage = () => {
         </div>
 
         <div className="text-right">
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex flex-col items-end gap-1 text-sm">
             <span className="text-green-600 font-medium">
               AI Evaluation Status: Completed
             </span>
-            <span className="bg-blue-50 text-blue-500 px-3 py-1 text-xs rounded-full">
+            <span className="bg-blue-50 text-blue-500 px-3 py-1 text-xs rounded-full w-fit">
               AI Insights Enabled
             </span>
           </div>
         </div>
       </div>
 
+      {/* Question Details */}
       {result.question_assessments.map((q, idx) => (
         <div
           key={q.id}
@@ -105,10 +150,30 @@ const AssessmentResultPage = () => {
                 ></div>
               </div>
 
-              <p className="mt-1 text-sm text-gray-700">
+              <div className="mt-2">
+                <label className="text-sm mr-2">Adjust Score:</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={q.max_score_possible}
+                  value={
+                    questionScores.find((s) => s.question_id === q.question_id)
+                      ?.new_score || 0
+                  }
+                  onChange={(e) =>
+                    handleScoreChange(q.question_id, e.target.value)
+                  }
+                  className="border rounded px-2 py-1 text-sm w-20"
+                />
+                <span className="text-xs text-gray-500 ml-2">
+                  / {q.max_score_possible}
+                </span>
+              </div>
+
+              {/* <p className="mt-2 text-sm text-gray-700">
                 Answer Quality:{" "}
                 <span className="font-semibold text-green-700">Good</span>
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -118,7 +183,8 @@ const AssessmentResultPage = () => {
         </div>
       ))}
 
-      <div className="bg-white rounded-xl shadow p-6">
+      {/* Summary Section */}
+      <div className="bg-white rounded-xl shadow p-6 mb-6">
         <h3 className="text-lg font-semibold mb-2">Final Feedback Summary</h3>
         <p className="text-sm text-gray-700 mb-1">
           {result.summary_of_performance}
@@ -130,6 +196,26 @@ const AssessmentResultPage = () => {
           {result.general_areas_for_improvement}
         </p>
       </div>
+
+      <div className="text-end">
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="mt-4 bg-blue cursor-pointer text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isSubmitting ? "Sending..." : "Send Report"}
+        </button>
+      </div>
+
+      {/* <button
+        onClick={() => {
+          console.log("questionScores: ", questionScores);
+        }}
+        disabled={isSubmitting}
+        className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+      >
+        CHEKKKKKK GEMINX
+      </button> */}
     </div>
   );
 };
