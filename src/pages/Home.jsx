@@ -2,77 +2,46 @@ import React from "react";
 import { CiLogin } from "react-icons/ci";
 import { HiOutlineBookOpen } from "react-icons/hi2";
 import { PiGraduationCap } from "react-icons/pi";
-import {
-  Book,
-  CheckCircle,
-  AlertCircle,
-  FileText,
-  Clock,
-  Send,
-} from "lucide-react";
+import { FileText, CheckCircle, Clock, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAllUserQuizzes, getUser } from "../services/user";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { joinQuiz } from "../services/quiz";
 import LoadingScreen from "../components/LoadingScreen";
 
 const Home = () => {
-  // const rawDummyActivities = [
-  //   {
-  //     day: "Today",
-  //     type: "My Quizzes",
-  //     status: "created",
-  //     quizTitle: "Introduction to Philosophy",
-  //     message: "Quiz created! Keep an eye on it regularly.",
-  //     time: "2 hours ago",
-  //   },
-  //   {
-  //     day: "Today",
-  //     type: "Enrolled",
-  //     status: "unfinished",
-  //     quizTitle: "Mathematics Basics",
-  //     message: "New quiz is out—make sure to complete it on time!",
-  //     time: "6 hours ago",
-  //   },
-  //   {
-  //     day: "Yesterday",
-  //     type: "Enrolled",
-  //     status: "submitted",
-  //     quizTitle: "Biology 101",
-  //     message: "Your score is coming soon, hang tight!",
-  //     time: "1 day ago",
-  //   },
-  //   {
-  //     day: "Yesterday",
-  //     type: "Enrolled",
-  //     status: "graded",
-  //     quizTitle: "Chemistry Fundamentals",
-  //     message: "Sarah Johnson completed the quiz",
-  //     time: "1 day ago",
-  //   },
-  //   {
-  //     day: "Yesterday",
-  //     type: "My Quizzes",
-  //     status: "done",
-  //     quizTitle: "Chemistry Fundamentals",
-  //     message: "All the participant already finish the quiz",
-  //     time: "1 day ago",
-  //   },
-  // ];
-
   const [rawDummyActivities, setRawDummyActivities] = useState([]);
-  const fetchRawActivities = async () => {
-    try {
-      const rawResponse = await getAllUserQuizzes();
-      console.log("rawResponse: ", rawResponse);
-      if (rawResponse.status == 200) {
-        setRawDummyActivities(rawResponse.data);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      setIsLoading(true);
+      try {
+        const [userResponse, rawResponse] = await Promise.all([
+          getUser(),
+          getAllUserQuizzes(),
+        ]);
+
+        if (userResponse.status === 200) {
+          setUserName(userResponse.data.name);
+        }
+
+        if (rawResponse.status === 200) {
+          setRawDummyActivities(rawResponse.data);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.log("error :", error);
-    }
-  };
+    };
+
+    fetchAll();
+  }, []);
 
   const recentActivities = rawDummyActivities.slice(0, 3).map((item, index) => {
     let iconComponent;
@@ -136,50 +105,23 @@ const Home = () => {
     };
   });
 
-  const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
-  const [joinCode, setJoinCode] = useState("");
-
-  const fetchUserData = async () => {
-    try {
-      const userResponse = await getUser();
-      console.log("userResponse: ", userResponse);
-      if (userResponse.status == 200) {
-        setUserName(userResponse.data.name);
-      }
-    } catch (error) {
-      console.log("error :", error);
-    }
-  };
-  useEffect(() => {
-    fetchUserData();
-    fetchRawActivities();
-  }, []);
-
   const joinHandle = async () => {
-    const payload = {
-      join_code: joinCode,
-    };
-
-    console.log("payload: ", payload);
-
+    const payload = { join_code: joinCode };
     try {
       const joinResponse = await joinQuiz(payload);
-      // console.log("joinResponse: ", joinResponse);
-      if (joinResponse.status == 200) {
+      if (joinResponse.status === 200) {
         navigate("/success-join");
       }
     } catch (error) {
-      console.log("error :", error);
+      console.error("Join error:", error);
     }
   };
+
   const createQuizHandle = () => {
     navigate("/create");
   };
 
-  if (!userName || recentActivities.length === 0) {
-    return <LoadingScreen />;
-  }
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-white px-6 py-20 font-sans text-gray-800">
@@ -247,7 +189,7 @@ const Home = () => {
             className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition"
           >
             <div className="flex justify-between mb-3">
-              <div className=" items-center gap-3">
+              <div className="items-center gap-3">
                 {activity.icon}
                 <div className="text-lg font-semibold text-gray-800 mt-6">
                   {activity.title}
