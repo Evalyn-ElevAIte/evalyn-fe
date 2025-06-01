@@ -15,6 +15,8 @@ const QuizInfo = () => {
   const [activeTab, setActiveTab] = useState("info");
   const [availableTabs, setAvailableTabs] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const fetchPeople = async () => {
     try {
       const peopleResponse = await getAllStudentsAssessments(quiz_id);
@@ -46,21 +48,23 @@ const QuizInfo = () => {
   }, [quiz_id]);
 
   useEffect(() => {
-    if (!quizData) return;
+    const loadData = async () => {
+      setIsLoading(true);
+      setQuizData(null); // ⬅️ clear previous quiz to trigger loader
+      setPeople([]); // optional: clear people list too
 
-    if (!quizData.status && quizData.completed !== null) {
-      // Teacher
-      setAvailableTabs(["info", "people", "grades"]);
-    } else if (quizData.status === "unfinished") {
-      setAvailableTabs(["info", "people"]);
-    } else if (quizData.status === "submited") {
-      setAvailableTabs(["info", "people"]);
-    } else if (quizData.status === "graded") {
-      setAvailableTabs(["info", "people", "grades"]);
-    } else {
-      setAvailableTabs(["info"]);
-    }
-  }, [quizData]);
+      try {
+        await fetchQuiz();
+        await fetchPeople();
+      } catch (error) {
+        console.error("Load data error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [quiz_id]);
 
   const getStatus = () => {
     return (
@@ -90,7 +94,7 @@ const QuizInfo = () => {
     grades: "Grades",
   };
 
-  if (!quizData || !people) {
+  if (isLoading || !quizData) {
     return <LoadingScreen />;
   }
 

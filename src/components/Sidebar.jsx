@@ -72,6 +72,10 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
     fetchMyQuizzesCreator();
   }, []);
 
+  const viewQuizHandle = (quiz_id) => {
+    navigate(`/quiz-info/${quiz_id}`);
+  };
+
   return (
     <div
       className={`fixed top-27 -left-1 ${sidebarWidth} h-screen bg-[#e8f1fb] flex flex-col justify-between pl-0 pr-4 py-4 rounded-r-4xl shadow-md border border-[#F2AA32]/55 z-50 transition-all duration-300 ease-in-out`}
@@ -79,7 +83,6 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
     >
       <div>
         <nav className="space-y-2 mt-4">
-          {/* Home */}
           <NavLink
             to="/home"
             className={({ isActive }) =>
@@ -148,7 +151,10 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
               {myQuizzes.map((quiz, index) => (
                 <div
                   key={index}
-                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"
+                  onClick={() => {
+                    viewQuizHandle(quiz.id);
+                  }}
+                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm hover:shadow-xl cursor-pointer text-sm text-gray-700"
                 >
                   <div className="bg-[#F2AA32] text-white font-bold rounded-full w-6 h-6 flex items-center justify-center text-xs">
                     P
@@ -207,7 +213,10 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
               {enrolledQuizzes.map((course, index) => (
                 <div
                   key={index}
-                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm text-sm text-gray-700"
+                  onClick={() => {
+                    viewQuizHandle(course.id);
+                  }}
+                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm hover:shadow-xl cursor-pointer text-sm text-gray-700"
                 >
                   <div className="bg-[#F2AA32] text-white font-bold rounded-full w-6 h-6 flex items-center justify-center text-xs">
                     P

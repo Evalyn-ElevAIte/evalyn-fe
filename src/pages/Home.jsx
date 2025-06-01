@@ -102,7 +102,7 @@ const Home = () => {
       }
 
       return {
-        id: index,
+        id: item.id,
         icon: iconComponent,
         title: `${titlePrefix} ${item.title}`,
         description: item.description,
@@ -144,12 +144,7 @@ const Home = () => {
       <h2 className="text-lg font-medium mb-4">What would you like to do?</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        <div
-          onClick={() => {
-            viewQuizHandle(quiz.id);
-          }}
-          className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition"
-        >
+        <div className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg transition">
           <div className="text-3xl mb-4">
             <HiOutlineBookOpen size={86} className="text-blue" />
           </div>
@@ -205,6 +200,9 @@ const Home = () => {
           {recentActivities.map((activity) => (
             <div
               key={activity.id}
+              onClick={() => {
+                viewQuizHandle(activity.id);
+              }}
               className="border border-orange/50 rounded-xl p-10 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg cursor-pointer transition"
             >
               <div className="flex justify-between mb-3">
