@@ -116,6 +116,14 @@ const GradesTab = ({ quizId, setActiveTab }) => {
 
           <div className="bg-blue-50 border border-blue-100 p-4 rounded text-sm">
             <div className="mb-2">
+              <p className="font-semibold mb-1">Key Points Covered:</p>
+              <ul className="list-disc list-inside text-green-500">
+                {q.key_points.map((m) => (
+                  <li key={m.id}>{m.key_point}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="mb-2">
               <p className="font-semibold mb-1">Missing Concepts:</p>
               <ul className="list-disc list-inside text-red-500">
                 {q.missing_concepts.map((m) => (

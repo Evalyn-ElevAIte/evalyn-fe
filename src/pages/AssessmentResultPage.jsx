@@ -9,12 +9,14 @@ const AssessmentResultPage = () => {
 
   const location = useLocation();
   const result = location.state?.result;
+
   const studentName = location.state?.studentName;
 
   const [questionScores, setQuestionScores] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    console.log("result: ", result);
     if (result) {
       setQuestionScores(
         result.question_assessments.map((q) => ({
@@ -123,6 +125,14 @@ const AssessmentResultPage = () => {
           </div>
 
           <div className="bg-blue-50 border border-blue-100 p-4 rounded text-sm">
+            <div className="mb-2">
+              <p className="font-semibold mb-1">Key Points Covered:</p>
+              <ul className="list-disc list-inside text-green-500">
+                {q.key_points.map((m) => (
+                  <li key={m.id}>{m.key_point}</li>
+                ))}
+              </ul>
+            </div>
             <div className="mb-2">
               <p className="font-semibold mb-1">Missing Concepts:</p>
               <ul className="list-disc list-inside text-red-500">
