@@ -88,7 +88,7 @@ const PublishedQuizInfo = ({ quiz, quiz_id }) => {
   return (
     <div className="p-6">
       <div className="flex justify-between">
-        <h1 className="text-2xl font-bold mb-2">Quiz Overview</h1>
+        <h1 className="text-2xl font-bold mb-2">{quiz.title}</h1>
         <div className="flex items-center justify-center gap-2">
           <span className="text-xl font-semibold text-blue-600">
             {quiz.join_code}
@@ -101,7 +101,6 @@ const PublishedQuizInfo = ({ quiz, quiz_id }) => {
           </button>
         </div>
       </div>
-
       <p className="text-gray-600 mb-6">
         Quiz ID: {quiz_id} - Comprehensive performance analytics
       </p>

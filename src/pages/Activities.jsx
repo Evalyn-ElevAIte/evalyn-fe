@@ -133,7 +133,7 @@ const Activities = () => {
 
   return (
     <div className="pt-8">
-      <div className="bg-blue-50 px-6 py-12 rounded-t-lg">
+      <div className="bg-blue-50 px-10 py-12 rounded-t-lg">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Recent Activity
         </h2>
@@ -199,7 +199,7 @@ const Activities = () => {
                   return (
                     <div
                       key={index}
-                      className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col md:flex-row justify-between items-start md:items-center"
+                      className="bg-white rounded-xl border border-gray-100 shadow-sm px-7 py-4 flex flex-col md:flex-row justify-between items-start md:items-center"
                     >
                       <div className="flex items-start flex-grow">
                         <div

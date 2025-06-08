@@ -172,11 +172,11 @@ const Home = () => {
             Enter a quiz code to participate and get AI-based feedback on your
             answers.
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-6">
             <input
               type="text"
               placeholder="Enter quiz code..."
-              className="border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border border-orange/50 rounded-2xl px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={joinCode}
               onChange={(e) => {
                 setJoinCode(e.target.value);

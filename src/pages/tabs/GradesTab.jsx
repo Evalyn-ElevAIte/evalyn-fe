@@ -17,10 +17,16 @@ const GradesTab = ({ quizId, setActiveTab }) => {
         const nameResponse = await getUser();
         if (nameResponse.status === 200) {
           const currentUserName = nameResponse.data.name;
+          console.log("currentUserName: ", currentUserName);
           setUserName(currentUserName);
 
           const gradesResponse = await getAllStudentsAssessments(quizId);
           if (gradesResponse.status === 200) {
+            console.log(
+              "gradesResponse.data.assessments: ",
+              gradesResponse.data.assessments
+            );
+
             const filtered = gradesResponse.data.assessments.filter(
               (item) =>
                 item.status === "graded" &&
@@ -29,6 +35,7 @@ const GradesTab = ({ quizId, setActiveTab }) => {
 
             if (filtered.length > 0) {
               const assessmentId = filtered[0].assessment_id;
+              console.log("assessmentId: ", assessmentId);
               const detailResponse = await getAssessmentById(assessmentId);
               if (detailResponse.status === 200) {
                 setSelectedDetail(detailResponse.data);
@@ -105,7 +112,7 @@ const GradesTab = ({ quizId, setActiveTab }) => {
           <h3 className="font-semibold text-sm mb-2">
             Question {idx + 1}: {q.question_text}
           </h3>
-
+          {console.log("q.student_answer_text: ", q.student_answer_text)}
           <div className="bg-gray-50 border rounded p-3 text-sm mb-3">
             {q.student_answer_text ? (
               <p>{q.student_answer_text}</p>
