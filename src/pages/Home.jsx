@@ -14,6 +14,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("");
   const [joinCode, setJoinCode] = useState("");
+  const [isFinishFetch, setIsFinishFetch] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,6 +41,7 @@ const Home = () => {
         setRawDummyActivities([]);
       } finally {
         setIsLoading(false);
+        setIsFinishFetch(true);
       }
     };
 
@@ -132,7 +134,7 @@ const Home = () => {
     navigate(`/quiz-info/${quiz_id}`);
   };
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading && !isFinishFetch) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-white px-6 py-20 font-sans text-gray-800">

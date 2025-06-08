@@ -30,7 +30,7 @@ const SignIn = () => {
 
         setTimeout(() => {
           navigate("/home");
-        }, 2500);
+        }, 4000);
         // const userResponse = await getUser();
         // if (userResponse.status == 200) {
         //   console.log("userResponse: ", userResponse);

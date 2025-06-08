@@ -10,29 +10,27 @@ import { getUser } from "../services/user";
 
 const Topbar = ({ isExpanded, setIsExpanded }) => {
   const [hasNotification, setHasNotification] = useState(true);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState("?");
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const userResponse = await Promise.all([getUser()]);
-        console.log("userResponse: ", userResponse);
-        if (userResponse.status === 200) {
-          setUserName(userResponse.data.name);
-        }
+  const fetchAll = async () => {
+    try {
+      const userResponse = await Promise.all([getUser()]);
+      const user = userResponse[0];
+      console.log("userResponse.data.name:", user.data.name);
 
-        console.log("userResponse.data.name: ", userResponse.data.name);
-      } catch (error) {
-        console.error("Fetch error:", error);
-        setRawDummyActivities([]);
-      } finally {
+      if (user.status === 200) {
+        setUserName(user.data.name);
       }
-    };
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
 
-    fetchAll();
-  }, []);
+  fetchAll();
+}, []);
 
-  return (
+return (
     <div className="fixed top-0 w-full">
       <div className="flex justify-between items-center px-8 h-27 border-b border-gray-100 shadow-sm bg-white z-50">
         <div className="ml-4 flex gap-10">
@@ -62,13 +60,21 @@ const Topbar = ({ isExpanded, setIsExpanded }) => {
             )}
           </div>
 
-          <img
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-              userName
-            )}&background=random`}
-            alt={userName}
-            className="w-10 h-10 rounded-full object-cover"
-          />
+          {userName ? (
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                userName
+              )}&background=random`}
+              alt={userName}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <img
+              src={DummyPhoto}
+              alt="Default User"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          )}
         </div>
       </div>
     </div>
