@@ -24,37 +24,38 @@ const services = [
 
 const OurServices = () => {
   return (
-    <div>
-      <section className="bg-[#F3FAFF]">
-        <div className="py-48 flex flex-col items-center justify-center">
-          <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <RiServiceLine size={64} className="text-orange" />
-            </div>
-            <h2 className="text-3xl font-semibold">Our services</h2>
-
-            <div className="w-160 h-[4px] rounded-full bg-yellow-500 mx-auto mt-12 mb-6" />
-            <p className="text-gray-700 mb-24 text-lg flex justify-center">
-              Let's start our partnership by knowing each other!
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 md:px-0 max-w-6xl">
-              {services.map((service, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg border border-orange/50 shadow-md p-8 text-left hover:shadow-lg transition duration-300"
-                >
-                  {service.icon}
-                  <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {service.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+    <section className="bg-[#F3FAFF]">
+      <div className="py-20 sm:py-24 px-10 sm:px-8 lg:px-12 flex flex-col items-center">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <RiServiceLine size={56} className="text-orange" />
           </div>
+          <h2 className="text-2xl sm:text-3xl font-semibold">Our Services</h2>
+
+          <div className="w-24 sm:w-40 h-[4px] rounded-full bg-yellow-500 mx-auto mt-8 sm:mt-12 mb-4 sm:mb-6" />
+          <p className="text-gray-700 mb-12 sm:mb-20 text-base sm:text-lg">
+            Let's start our partnership by knowing each other!
+          </p>
         </div>
-      </section>
-    </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 w-full max-w-6xl">
+          {services.map((service, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl border border-orange/40 shadow-md p-6 sm:p-8 text-center hover:shadow-lg transition duration-300"
+            >
+              {service.icon}
+              <h3 className="text-lg sm:text-xl font-bold mb-2">
+                {service.title}
+              </h3>
+              <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
+                {service.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
