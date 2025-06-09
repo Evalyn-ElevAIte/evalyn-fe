@@ -1,27 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaHistory, FaHome } from "react-icons/fa";
 import { GoBook } from "react-icons/go";
 import { LuSettings } from "react-icons/lu";
 import { RiArrowUpSFill, RiArrowDownSFill } from "react-icons/ri";
 import { BsFillPersonFill } from "react-icons/bs";
-import { NavLink, useNavigate } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
+import { NavLink, useNavigate } from "react-router-dom";
 import { getUserQuizzes, getUserQuizzesCreator } from "../services/user";
-import { useEffect } from "react";
 
 const Sidebar = ({ isExpanded, setIsExpanded }) => {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isEnrolledOpen, setIsEnrolledOpen] = useState(false);
-
   const [myQuizzes, setMyQuizzes] = useState([]);
   const [enrolledQuizzes, setEnrolledQuizzes] = useState([]);
 
   const navigate = useNavigate();
-
-  const sidebarWidth = isExpanded ? "w-86" : "w-32";
+  const sidebarWidth = isExpanded ? "w-72" : "w-20";
 
   const handleLogout = () => {
-    console.log("Logging out...");
     localStorage.clear();
     navigate("/signin");
   };
@@ -34,59 +30,41 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
     timeZone: "Asia/Jakarta",
   };
 
-  const fetchMyQuizzes = async () => {
-    try {
-      const response = await getUserQuizzes();
-      if (response.status === 200) {
-        if (Array.isArray(response.data)) {
-          setEnrolledQuizzes(response.data);
-        } else if (response.data?.message === "User has no quizzes.") {
-          setEnrolledQuizzes([]);
-        }
-      }
-    } catch (error) {
-      console.log("error :", error);
-      setEnrolledQuizzes([]);
-    }
-  };
-
-  const fetchMyQuizzesCreator = async () => {
-    try {
-      const response = await getUserQuizzesCreator();
-      console.log("myQuizzesResponse: ", response);
-      if (response.status === 200) {
-        if (Array.isArray(response.data)) {
-          setMyQuizzes(response.data);
-        } else if (response.data?.message === "User has no quizzes.") {
-          setMyQuizzes([]);
-        }
-      }
-    } catch (error) {
-      console.log("error :", error);
-      setMyQuizzes([]);
-    }
-  };
-
   useEffect(() => {
-    fetchMyQuizzes();
-    fetchMyQuizzesCreator();
+    const fetchData = async () => {
+      try {
+        const [quizResp, creatorResp] = await Promise.all([
+          getUserQuizzes(),
+          getUserQuizzesCreator(),
+        ]);
+        if (quizResp.status === 200) {
+          setEnrolledQuizzes(Array.isArray(quizResp.data) ? quizResp.data : []);
+        }
+        if (creatorResp.status === 200) {
+          setMyQuizzes(Array.isArray(creatorResp.data) ? creatorResp.data : []);
+        }
+      } catch (error) {
+        console.error("Sidebar fetch error:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const viewQuizHandle = (quiz_id) => {
-    navigate(`/quiz-info/${quiz_id}`);
-  };
+  const viewQuizHandle = (quiz_id) => navigate(`/quiz-info/${quiz_id}`);
 
   return (
     <div
-      className={`fixed top-27 -left-1 ${sidebarWidth} h-screen bg-[#e8f1fb] flex flex-col justify-between pl-0 pr-4 py-4 rounded-r-4xl shadow-md border border-[#F2AA32]/55 z-50 transition-all duration-300 ease-in-out`}
-      style={{ height: "calc(100vh - 80px)" }}
+      className={`fixed top-[80px] left-0 h-[calc(100vh-80px)] bg-[#e8f1fb] flex-col justify-between pl-0 pr-2 py-4 rounded-r-3xl shadow-md border border-[#F2AA32]/55 z-50 transition-all duration-300 ease-in-out overflow-y-auto
+    ${isExpanded ? "flex w-72" : "hidden"}
+    md:flex ${isExpanded ? "md:w-72" : "md:w-20"}`}
     >
       <div>
         <nav className="space-y-2 mt-4">
           <NavLink
             to="/home"
             className={({ isActive }) =>
-              `w-full flex items-center gap-6 pl-14 py-4 text-lg text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
+              `w-full flex items-center gap-4 pl-8 py-3 text-sm rounded-r-full transition-all duration-200 ${
                 isActive
                   ? "bg-white text-blue font-bold border border-[#F2AA32]"
                   : "hover:bg-white hover:shadow-sm text-gray-600"
@@ -97,11 +75,10 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
             {isExpanded && <span>Home</span>}
           </NavLink>
 
-          {/* Activity */}
           <NavLink
             to="/activity"
             className={({ isActive }) =>
-              `w-full flex items-center gap-6 pl-14 py-4 text-left text-lg rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
+              `w-full flex items-center gap-4 pl-8 py-3 text-sm rounded-r-full transition-all duration-200 ${
                 isActive
                   ? "bg-white text-blue font-bold border border-[#F2AA32]"
                   : "hover:bg-white hover:shadow-sm text-gray-600"
@@ -112,59 +89,46 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
             {isExpanded && <span>Activity</span>}
           </NavLink>
 
-          {isExpanded && (
-            <div className="border-t border-[#F2AA32] mr-8 my-6" />
-          )}
+          {isExpanded && <hr className="border-t border-[#F2AA32] mx-6 my-4" />}
 
           {/* My Quizzes */}
           <div
-            className={`w-full pl-14 py-4 text-lg cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
-              isQuizOpen ? "border border-orange" : ""
+            className={`pl-8 py-3 flex items-center gap-3 text-sm cursor-pointer hover:bg-white rounded-r-full transition ${
+              isQuizOpen ? "border border-orange bg-white shadow-sm" : ""
             }`}
             onClick={() => {
               setIsQuizOpen(!isQuizOpen);
-              if (!isExpanded) setIsExpanded(true);
               setIsEnrolledOpen(false);
-              if (isQuizOpen) {
-                navigate("/quizzes");
-              }
+              if (!isExpanded) setIsExpanded(true);
+              if (isQuizOpen) navigate("/quizzes");
             }}
           >
             {isExpanded &&
               (isQuizOpen ? (
-                <RiArrowUpSFill size={24} className="text-orange" />
+                <RiArrowUpSFill className="text-orange" size={20} />
               ) : (
-                <RiArrowDownSFill size={24} className="text-orange" />
+                <RiArrowDownSFill className="text-orange" size={20} />
               ))}
-            <div
-              className={`ml-2 flex items-center gap-4 ${
-                isQuizOpen ? "text-blue font-bold" : ""
-              }`}
-            >
-              <GoBook size={18} />
-              {isExpanded && <span>My Quizzes</span>}
-            </div>
+            <GoBook size={18} />
+            {isExpanded && <span>My Quizzes</span>}
           </div>
 
           {isExpanded && isQuizOpen && (
-            <div className="ml-14 mt-4 space-y-3">
+            <div className="ml-8 mt-2 space-y-2">
               {myQuizzes.map((quiz, index) => (
                 <div
                   key={index}
-                  onClick={() => {
-                    viewQuizHandle(quiz.id);
-                  }}
-                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm hover:shadow-xl cursor-pointer text-sm text-gray-700"
+                  onClick={() => viewQuizHandle(quiz.id)}
+                  className="flex gap-2 items-center py-2 px-4 bg-white rounded-full shadow-sm hover:shadow-md cursor-pointer text-sm text-gray-700 truncate"
                 >
                   <div className="bg-[#F2AA32] text-white font-bold rounded-full w-6 h-6 flex items-center justify-center text-xs">
                     P
                   </div>
-                  <div>
-                    <div className="font-semibold truncate w-28">
+                  <div className="truncate">
+                    <div className="font-medium truncate max-w-[140px]">
                       {quiz.title}
                     </div>
                     <div className="text-xs text-gray-500">
-                      due to:{" "}
                       {quiz.end_time &&
                         new Date(quiz.end_time).toLocaleDateString(
                           "en-US",
@@ -177,56 +141,45 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
             </div>
           )}
 
-          {/* Enrolled Courses Dropdown */}
+          {/* Enrolled */}
           <div
-            className={`w-full pl-14 mt-4
-               py-4 text-lg cursor-pointer rounded-r-full flex items-center text-gray-600 hover:bg-white hover:shadow-sm transition-all duration-200 ${
-                 isEnrolledOpen ? "border border-orange" : ""
-               }`}
+            className={`pl-8 py-3 flex items-center gap-3 text-sm cursor-pointer hover:bg-white rounded-r-full transition ${
+              isEnrolledOpen ? "border border-orange bg-white shadow-sm" : ""
+            }`}
             onClick={() => {
               setIsEnrolledOpen(!isEnrolledOpen);
+              setIsQuizOpen(false);
               if (!isExpanded) setIsExpanded(true);
-              if (isQuizOpen) setIsQuizOpen(false);
-              if (isEnrolledOpen) {
-                navigate("/quizzes");
-              }
+              if (isEnrolledOpen) navigate("/quizzes");
             }}
           >
             {isExpanded &&
               (isEnrolledOpen ? (
-                <RiArrowUpSFill size={24} className="text-orange" />
+                <RiArrowUpSFill className="text-orange" size={20} />
               ) : (
-                <RiArrowDownSFill size={24} className="text-orange" />
+                <RiArrowDownSFill className="text-orange" size={20} />
               ))}
-            <div
-              className={`ml-2 flex items-center gap-4 ${
-                isEnrolledOpen ? "text-blue font-bold" : ""
-              }`}
-            >
-              <BsFillPersonFill size={18} />
-              {isExpanded && <span>Enrolled</span>}
-            </div>
+            <BsFillPersonFill size={18} />
+            {isExpanded && <span>Enrolled</span>}
           </div>
 
           {isExpanded && isEnrolledOpen && (
-            <div className="ml-14 mt-4 space-y-3">
-              {enrolledQuizzes.map((course, index) => (
+            <div className="ml-6 mt-2 space-y-2">
+              {enrolledQuizzes.map((quiz, index) => (
                 <div
                   key={index}
-                  onClick={() => {
-                    viewQuizHandle(course.id);
-                  }}
-                  className="flex gap-2 items-center py-3 px-5 bg-white rounded-full shadow-sm hover:shadow-xl cursor-pointer text-sm text-gray-700"
+                  onClick={() => viewQuizHandle(quiz.id)}
+                  className="flex gap-2 items-center py-2 px-4 bg-white rounded-full shadow-sm hover:shadow-md cursor-pointer text-sm text-gray-700 truncate"
                 >
                   <div className="bg-[#F2AA32] text-white font-bold rounded-full w-6 h-6 flex items-center justify-center text-xs">
                     P
                   </div>
-                  <div>
-                    <div className="font-semibold truncate w-28">
-                      {course.title}
+                  <div className="truncate">
+                    <div className="font-medium truncate max-w-[140px]">
+                      {quiz.title}
                     </div>
                     <div className="text-xs text-gray-500">
-                      due to: {course.dueDate}
+                      {quiz.dueDate || "No due date"}
                     </div>
                   </div>
                 </div>
@@ -236,11 +189,12 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
         </nav>
       </div>
 
-      <div>
+      {/* Settings & Logout */}
+      <div className="mb-4">
         <NavLink
           to="/settings"
           className={({ isActive }) =>
-            `w-full flex items-center mb-4 gap-6 pl-14 py-4 text-lg text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 ${
+            `w-full flex items-center gap-4 pl-8 py-3 text-sm rounded-r-full transition-all duration-200 ${
               isActive
                 ? "bg-white text-blue font-bold border border-[#F2AA32]"
                 : "hover:bg-white hover:shadow-sm text-gray-600"
@@ -253,7 +207,7 @@ const Sidebar = ({ isExpanded, setIsExpanded }) => {
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center mb-8 gap-6 pl-14 py-4 text-lg text-left rounded-l-none rounded-r-full cursor-pointer transition-all duration-200 hover:bg-white hover:shadow-sm text-red-600"
+          className="w-full flex items-center gap-4 pl-8 py-3 text-sm text-red-600 hover:bg-white hover:shadow-sm rounded-r-full"
         >
           <FiLogOut size={18} />
           {isExpanded && <span>Logout</span>}
