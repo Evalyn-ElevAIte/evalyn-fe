@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "../components/LoadingScreen";
 import { updateAssessmentGrading } from "../services/assessments";
+import { Bot } from "lucide-react";
 
 const AssessmentResultPage = () => {
   const navigate = useNavigate();
@@ -112,9 +113,16 @@ const AssessmentResultPage = () => {
           key={q.id}
           className="bg-white border border-gray-200 rounded-xl p-6 mb-6"
         >
-          <h3 className="font-semibold text-sm mb-2">
-            Question {idx + 1}: {q.question_text}
-          </h3>
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-semibold text-sm">
+              Question {idx + 1}: {q.question_text}
+            </h3>
+
+            <span className="flex items-center text-xs font-medium text-red-500 whitespace-nowrap ml-4">
+              <Bot className="w-4 h-4 mr-1" />
+              AI Check: {q.rating_plagiarism}%
+            </span>
+          </div>
 
           <div className="bg-gray-50 border rounded p-3 text-sm mb-3">
             {q.student_answer_text ? (

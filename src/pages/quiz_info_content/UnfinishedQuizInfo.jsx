@@ -39,9 +39,9 @@ const UnfinishedQuizInfo = ({ quiz }) => {
       <div className="flex items-center text-sm text-gray-700 mb-2">
         <BsClock className="mr-2" /> Duration: {quiz.duration || "15 minutes"}
       </div>
-      <div className="flex items-center text-sm text-gray-700 mb-4">
+      {/* <div className="flex items-center text-sm text-gray-700 mb-4">
         <FaRegListAlt className="mr-2" /> {quiz.totalQuestions || 25} questions
-      </div>
+      </div> */}
 
       <div className="bg-yellow-50 text-yellow-800 text-sm rounded-md p-3 border border-yellow-200 mb-4">
         <BsExclamationCircle className="inline mr-2" />
@@ -52,7 +52,7 @@ const UnfinishedQuizInfo = ({ quiz }) => {
       <div className="flex justify-end">
         <button
           onClick={onStart}
-          className=" cursor-pointer bg-blue hover:bg-blue-600 text-white text-xl font-semibold py-6 px-14 rounded-lg"
+          className="cursor-pointer bg-blue hover:bg-blue-600 text-base sm:text-lg md:text-xl font-semibold py-3 sm:py-4 md:py-6 px-6 sm:px-10 md:px-14 rounded-lg w-full sm:w-auto text-white"
         >
           Start Quiz
         </button>

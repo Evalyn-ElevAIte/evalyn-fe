@@ -132,9 +132,11 @@ const QuizStartPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 mt-12">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{quizData.title}</h1>
-        <span className="text-red-600 font-semibold">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-6">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
+          {quizData.title}
+        </h1>
+        <span className="text-sm sm:text-base md:text-lg text-red-600 font-semibold">
           Time Left: {formatTime(remainingTime)}
         </span>
       </div>

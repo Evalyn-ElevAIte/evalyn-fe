@@ -13,9 +13,19 @@ import { getQuizStatistics } from "../../services/assessments";
 const PublishedQuizInfo = ({ quiz, quiz_id }) => {
   const [overview, setOverview] = useState(null);
   const [activeTab, setActiveTab] = useState("top");
-  const handleCopy = () => {
-    navigator.clipboard.writeText(quiz.join_code);
-    alert("Quiz code copied!");
+
+  const handleCopy = async () => {
+    if (navigator?.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(quiz.join_code);
+        alert("Quiz code copied!");
+      } catch (err) {
+        console.error("Clipboard copy failed:", err);
+        alert("Failed to copy quiz code.");
+      }
+    } else {
+      alert("Clipboard API is not supported in this browser.");
+    }
   };
   useEffect(() => {
     const fetchStats = async () => {
