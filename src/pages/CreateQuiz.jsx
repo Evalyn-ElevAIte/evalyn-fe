@@ -263,7 +263,15 @@ const CreateQuiz = () => {
           placeholder="Write a short description about this quiz..."
           className="w-full mb-3 px-4 py-2 border border-gray-200 rounded-xl"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            const input = e.target.value;
+            const words = input.trim().split(/\s+/);
+            if (words.length <= 200) {
+              setDescription(input);
+            } else {
+              setDescription(words.slice(0, 200).join(" "));
+            }
+          }}
         />
 
         <div className="flex items-center gap-2 mb-2">
